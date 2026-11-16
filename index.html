@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Саша в стране Синьки</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}
+body{background:radial-gradient(circle at 50% 10%,#fff 0%,#f1f5f8 45%,#e1e8ee 100%);color:#242424}
+button{font-family:inherit;border:0}
+#menu{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:25px;background:radial-gradient(circle at 50% 20%,#fff 0%,#eef3f7 55%,#dce5ec 100%)}
+.logo{font-size:clamp(34px,11vw,62px);font-weight:900;letter-spacing:-3px;text-align:center;line-height:.95;color:#252525}
+.logo span{color:#2f6fd0}
+.subtitle{margin-top:15px;max-width:310px;text-align:center;font-size:15px;line-height:1.45;color:#6d7780}
+.character-preview{width:150px;height:150px;margin:35px 0 30px;border-radius:45px;background:rgba(255,255,255,.75);box-shadow:0 20px 60px rgba(50,70,90,.14),inset 0 1px 0 #fff;display:flex;align-items:center;justify-content:center;position:relative;animation:float 2.5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.preview-girl{width:72px;height:110px}
+.play{width:min(320px,85vw);padding:17px 25px;border-radius:20px;background:#252525;color:#fff;font-size:16px;font-weight:800;letter-spacing:.5px;box-shadow:0 12px 25px rgba(30,30,30,.18);cursor:pointer;transition:.15s}
+.play:active{transform:scale(.96)}
+#game{display:none;position:fixed;inset:0;overflow:hidden;background:linear-gradient(to bottom,#f4f8fb 0%,#edf2f6 72%,#dde5ec 100%)}
+.topbar{position:absolute;top:18px;left:18px;right:18px;display:flex;justify-content:space-between;z-index:20}
+.badge{padding:9px 14px;border-radius:999px;background:rgba(255,255,255,.72);backdrop-filter:blur(15px);font-size:13px;font-weight:800;box-shadow:0 8px 25px rgba(50,70,90,.08)}
+#score{font-variant-numeric:tabular-nums}
+.cloud{position:absolute;width:90px;height:25px;background:rgba(255,255,255,.8);border-radius:30px;animation:cloudMove linear infinite}
+.cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%}
+.cloud:before{width:35px;height:35px;left:17px;top:-17px}
+.cloud:after{width:45px;height:45px;right:13px;top:-25px}
+.cloud.c1{top:25%;left:100%;animation-duration:25s}
+.cloud.c2{top:15%;left:120%;scale:.65;animation-duration:34s}
+@keyframes cloudMove{from{transform:translateX(0)}to{transform:translateX(-140vw)}}
+.ground{position:absolute;bottom:0;left:0;width:100%;height:105px;background:linear-gradient(to bottom,#c9d3db 0,#c9d3db 4px,#b7c3cd 4px,#b7c3cd 100%)}
+.ground:after{content:"";position:absolute;top:4px;left:0;width:100%;height:2px;background:#a4b1bd}
+#player{position:absolute;left:14%;bottom:105px;width:65px;height:100px;z-index:5}
+#player svg,.char svg,.preview-girl svg{display:block;width:100%;height:100%;overflow:visible}
+.leg-a,.leg-b{transform-box:fill-box;transform-origin:50% 0}
+#player.run .leg-a{animation:stepA .32s ease-in-out infinite alternate}
+#player.run .leg-b{animation:stepB .32s ease-in-out infinite alternate}
+@keyframes stepA{from{transform:rotate(-20deg)}to{transform:rotate(20deg)}}
+@keyframes stepB{from{transform:rotate(20deg)}to{transform:rotate(-20deg)}}
+.tip{transform-origin:32px 100px;animation:tipsy 1s ease-in-out infinite alternate}
+@keyframes tipsy{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
+.stars{transform-origin:32.5px 4px;animation:spin 1.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hic{animation:hic 1.2s ease-in-out infinite}
+@keyframes hic{0%,100%{opacity:0;transform:translateY(4px)}40%,70%{opacity:1;transform:translateY(0)}}
+.obstacle{position:absolute;bottom:105px;width:32px;height:70px;z-index:4;filter:drop-shadow(0 6px 6px rgba(30,50,70,.2))}
+.obstacle svg{display:block;width:100%;height:100%;transform-origin:50% 100%;animation:wobble .55s ease-in-out infinite alternate}
+@keyframes wobble{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+#gameOver{display:none;position:absolute;inset:0;z-index:30;align-items:center;justify-content:center;background:rgba(240,245,249,.5);backdrop-filter:blur(8px)}
+.card{width:min(340px,88vw);padding:30px 25px;border-radius:30px;background:rgba(255,255,255,.9);box-shadow:0 25px 70px rgba(40,60,80,.2);text-align:center}
+.card h2{margin:0;font-size:27px;letter-spacing:-1px}
+.card p{margin:10px 0 20px;color:#6d7780;font-size:14px}
+.final-score{font-size:40px;font-weight:900;margin-bottom:20px}
+.over-scene{position:relative;width:220px;height:150px;margin:0 auto 14px}
+.over-scene .puddle{position:absolute;left:50%;bottom:0;width:200px;height:26px;transform:translateX(-50%);background:#3b7fd6;border-radius:50%;box-shadow:inset 0 -5px 0 #2a5da8;opacity:.85}
+.over-scene .char{position:absolute;left:36px;top:6px;width:96px;height:144px}
+.over-scene .fallen{position:absolute;right:6px;bottom:8px;width:50px;height:60px;transform:rotate(78deg)}
+@media (max-width:600px){.logo{font-size:42px}.character-preview{width:135px;height:135px;margin:28px 0}#player{left:12%}}
+</style>
+</head>
+<body>
+
+<section id="menu">
+  <div class="logo">САША<br><span>В СТРАНЕ<br>СИНЬКИ</span></div>
+  <div class="subtitle">Прыгай через бутылки и не дай синьке сбить тебя с ног.</div>
+  <div class="character-preview"><div class="preview-girl" id="previewGirl"></div></div>
+  <button class="play" id="playBtn" type="button">ИГРАТЬ</button>
+</section>
+
+<section id="game">
+  <div class="topbar">
+    <div class="badge">САША ✦ СИНЬКА</div>
+    <div class="badge"><span id="score">0000</span></div>
+  </div>
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div id="player"></div>
+  <div class="ground"></div>
+  <div id="gameOver">
+    <div class="card">
+      <div class="over-scene">
+        <div class="puddle"></div>
+        <div class="char" id="overGirl"></div>
+        <div class="fallen" id="overBottle"></div>
+      </div>
+      <h2>САША ПОПАЛАСЬ 🥴</h2>
+      <p>Синька всё-таки сбила тебя с ног.</p>
+      <div class="final-score"><span id="finalScore">0</span></div>
+      <button class="play" id="restartBtn" type="button">ЕЩЁ РАЗ</button>
+    </div>
+  </div>
+</section>
+
+<script>
+let gameRunning=false,jumping=false,score=0,speed=6,obstacles=[],spawnTimer,scoreTimer,animationFrame;
+const player=document.getElementById("player"),menu=document.getElementById("menu"),game=document.getElementById("game"),gameOver=document.getElementById("gameOver"),scoreEl=document.getElementById("score"),finalScore=document.getElementById("finalScore"),overGirl=document.getElementById("overGirl"),overBottle=document.getElementById("overBottle");
+const BOTTLES=[["#3f9b5a","#2c7342"],["#3b7fd6","#2a5da8"],["#9a5b2c","#6e3d1a"]];
+
+function girlSVG(dizzy){
+const eyes=dizzy?`<g fill="none" stroke="#222" stroke-width="1.2" stroke-linecap="round"><path transform="translate(25 33)" d="M0 0 c1-1.2 2.4-.4 2.2 .9 c-.2 1.9-3.2 2.1-3.8 .2 c-.7-2.4 2-4.4 4.6-3.2 c3 1.6 1.2 5.8-1.8 6.4"/><path transform="translate(40 33)" d="M0 0 c1-1.2 2.4-.4 2.2 .9 c-.2 1.9-3.2 2.1-3.8 .2 c-.7-2.4 2-4.4 4.6-3.2 c3 1.6 1.2 5.8-1.8 6.4"/></g><ellipse cx="18.5" cy="40" rx="4.6" ry="2.8" fill="#ff6f78" opacity=".75"/><ellipse cx="46.5" cy="40" rx="4.6" ry="2.8" fill="#ff6f78" opacity=".75"/><ellipse cx="32.5" cy="38" rx="2.4" ry="1.6" fill="#ff8c8c" opacity=".8"/><path d="M27 44.5 q2.6-3 5.2 0 t5.2 0" stroke="#9a4d3b" stroke-width="2" fill="none" stroke-linecap="round"/>`:`<ellipse cx="25" cy="33" rx="3" ry="4.1" fill="#2a2020"/><circle cx="26" cy="31.5" r="1.2" fill="#fff"/><ellipse cx="40" cy="33" rx="3" ry="4.1" fill="#2a2020"/><circle cx="41" cy="31.5" r="1.2" fill="#fff"/><ellipse cx="19" cy="40" rx="3.4" ry="2" fill="#ff9e8a" opacity=".55"/><ellipse cx="46" cy="40" rx="3.4" ry="2" fill="#ff9e8a" opacity=".55"/><path d="M28 40 Q32.5 45 37 40" stroke="#9a4d3b" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+const stars=dizzy?`<g class="stars" fill="#ffc933"><path d="M32.5 -17 l1.8 3.6 4 .6 -2.9 2.8 .7 4 -3.6-1.9 -3.6 1.9 .7-4 -2.9-2.8 4-.6z"/><path transform="translate(-26 24) scale(.8)" d="M32.5 -17 l1.8 3.6 4 .6 -2.9 2.8 .7 4 -3.6-1.9 -3.6 1.9 .7-4 -2.9-2.8 4-.6z"/><path transform="translate(26 24) scale(.8)" d="M32.5 -17 l1.8 3.6 4 .6 -2.9 2.8 .7 4 -3.6-1.9 -3.6 1.9 .7-4 -2.9-2.8 4-.6z"/></g><text class="hic" x="50" y="-6" font-size="10" font-weight="900" fill="#d6336c">ик!</text>`:"";
+const body=`<path d="M10 36 C7 10 24 2 33 2 C44 2 59 10 55 36 L56 52 Q54 57 48 55 L17 55 Q11 57 9 52Z" fill="#17171f"/><g class="leg-a"><rect x="24" y="72" width="8.5" height="21" rx="3" fill="#3f6fb5"/><path d="M21 93 h14 q2 0 2 3 v2 h-16 v-2 q0-3 0-3z" fill="#fff"/><rect x="20" y="97" width="17" height="2.5" rx="1" fill="#d3d8de"/></g><g class="leg-b"><rect x="34" y="72" width="8.5" height="21" rx="3" fill="#355f9f"/><path d="M31 93 h14 q2 0 2 3 v2 h-16 v-2 q0-3 0-3z" fill="#fff"/><rect x="30" y="97" width="17" height="2.5" rx="1" fill="#d3d8de"/></g><rect x="11" y="53" width="8" height="19" rx="4" fill="#f2c230" transform="rotate(8 14 53)"/><circle cx="12.5" cy="73" r="3.6" fill="#f6d3b3"/><rect x="46" y="53" width="8" height="19" rx="4" fill="#f2c230" transform="rotate(-8 51 53)"/><circle cx="52.5" cy="73" r="3.6" fill="#f6d3b3"/><path d="M18 52 Q32.5 46 47 52 L50 79 Q32.5 84 15 79Z" fill="#f2c230"/><path d="M15 76 Q32.5 81 50 76 L50 79 Q32.5 84 15 79Z" fill="#d9a91c"/><path d="M23 66 h19 l2 8 h-23z" fill="#e0b21f"/><path d="M28 50 L28 62 M37 50 L37 62" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><rect x="29" y="45" width="7" height="8" rx="2" fill="#e8bd98"/><ellipse cx="32.5" cy="31" rx="19.5" ry="20" fill="#f6d3b3"/><path d="M12.5 33 C9 10 25 3 33 3 C45 3 57 10 53 33 L51.5 24 Q33 17 14 24Z" fill="#17171f"/><path d="M12 30 Q10 45 14 53 L20 52 Q16 42 18 28Z" fill="#17171f"/><path d="M53 30 Q55 45 51 53 L45 52 Q49 42 47 28Z" fill="#17171f"/><path d="M20 9 Q28 5 38 7" stroke="#4b4b66" stroke-width="2" fill="none" stroke-linecap="round"/><rect x="42" y="15" width="9" height="3.4" rx="1.7" fill="#3b7fd6" transform="rotate(-18 46 17)"/>${eyes}`;
+return `<svg viewBox="0 0 65 100" xmlns="http://www.w3.org/2000/svg">${dizzy?'<g class="tip">'+body+stars+"</g>":body}</svg>`;
+}
+function bottleSVG(c,d){return `<svg viewBox="0 0 30 72" xmlns="http://www.w3.org/2000/svg"><rect x="11" y="0" width="8" height="4.5" rx="1.4" fill="#c9a227"/><path d="M12 4 H18 V20 C18 26 26 30 26 38 V66 Q26 70 22 70 H8 Q4 70 4 66 V38 C4 30 12 26 12 20Z" fill="${c}"/><path d="M4 56 H26 V66 Q26 70 22 70 H8 Q4 70 4 66Z" fill="${d}"/><rect x="4" y="46" width="22" height="12" fill="#f5efe0"/><rect x="4" y="50" width="22" height="3" fill="#d6504a"/><path d="M8 34 V44" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round"/><circle cx="11.5" cy="37" r="2.4" fill="#fff"/><circle cx="18.5" cy="37" r="2.4" fill="#fff"/><circle cx="12" cy="37.5" r="1.1" fill="#201b18"/><circle cx="18" cy="37.5" r="1.1" fill="#201b18"/><path d="M10 31.5 L14 33 M20 31.5 L16 33" stroke="#201b18" stroke-width="1.2" stroke-linecap="round"/><path d="M12 42 Q15 44 18 42" stroke="#201b18" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>`}
+document.getElementById("previewGirl").innerHTML=girlSVG(false);player.innerHTML=girlSVG(false);
+function startGame(){menu.style.display="none";game.style.display="block";gameRunning=true;player.innerHTML=girlSVG(false);player.classList.add("run");score=0;speed=6;scoreEl.textContent="0000";spawnObstacle();scoreTimer=setInterval(()=>{if(!gameRunning)return;score++;speed+=.008;scoreEl.textContent=String(score).padStart(4,"0")},100);animationFrame=requestAnimationFrame(update)}
+function jump(){if(!gameRunning||jumping)return;jumping=true;player.classList.remove("run");const start=performance.now(),duration=650;function jumpAnimation(now){const progress=(now-start)/duration;if(progress>=1){player.style.transform="translateY(0)";jumping=false;if(gameRunning)player.classList.add("run");return}const y=Math.sin(progress*Math.PI)*125;player.style.transform=`translateY(${-y}px)`;requestAnimationFrame(jumpAnimation)}requestAnimationFrame(jumpAnimation)}
+document.addEventListener("touchstart",e=>{if(!e.target.closest("button"))jump()},{passive:true});
+document.addEventListener("mousedown",e=>{if(!e.target.closest("button"))jump()});
+document.addEventListener("keydown",e=>{if(e.code==="Space"||e.code==="ArrowUp"){e.preventDefault();jump()}});
+function spawnObstacle(){if(!gameRunning)return;const obstacle=document.createElement("div");obstacle.className="obstacle";const b=BOTTLES[Math.floor(Math.random()*BOTTLES.length)];obstacle.innerHTML=bottleSVG(b[0],b[1]);obstacle.style.right="-50px";game.appendChild(obstacle);obstacles.push(obstacle);const next=Math.max(750,1500-score*2);spawnTimer=setTimeout(spawnObstacle,next)}
+function update(){if(!gameRunning)return;for(let i=obstacles.length-1;i>=0;i--){const obstacle=obstacles[i];let currentRight=parseFloat(obstacle.style.right);currentRight+=speed;obstacle.style.right=currentRight+"px";if(isCollision(player,obstacle)){endGame();return}if(currentRight>window.innerWidth+100){obstacle.remove();obstacles.splice(i,1)}}animationFrame=requestAnimationFrame(update)}
+function isCollision(a,b){const A=a.getBoundingClientRect(),B=b.getBoundingClientRect(),padding=14;return A.left+padding<B.right&&A.right-padding>B.left&&A.top+padding<B.bottom&&A.bottom-padding>B.top}
+function endGame(){gameRunning=false;clearInterval(scoreTimer);clearTimeout(spawnTimer);cancelAnimationFrame(animationFrame);finalScore.textContent=score;player.classList.remove("run");player.innerHTML=girlSVG(true);overGirl.innerHTML=girlSVG(true);overBottle.innerHTML=bottleSVG("#3b7fd6","#2a5da8");setTimeout(()=>{gameOver.style.display="flex"},450)}
+function restartGame(){obstacles.forEach(o=>o.remove());obstacles=[];gameOver.style.display="none";player.style.transform="translateY(0)";jumping=false;startGame()}
+document.getElementById("playBtn").addEventListener("click",startGame);
+document.getElementById("restartBtn").addEventListener("click",restartGame);
+</script>
+</body>
+</html>
