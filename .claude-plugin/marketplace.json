@@ -1,0 +1,8 @@
+{
+  "name": "sinka-plugins",
+  "owner": { "name": "sinka-game" },
+  "plugins": [
+    { "name": "lyric-video-edit", "source": "./plugins/lyric-video-edit", "description": "Vertical lyric-video edits with word-by-word captions and app-screen scenes, synced to the vocal when a track is given." },
+    { "name": "lyric-video", "source": "./plugins/lyric-video", "description": "/lyric-video command that sends the lyric-video brief with your lyrics." }
+  ]
+}
