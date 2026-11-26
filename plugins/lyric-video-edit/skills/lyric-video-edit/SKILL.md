@@ -12,7 +12,7 @@ Build a vertical lyric edit from pasted lyrics: one HTML page where every lyric 
 - MP4, 1080×1920, 30 fps, H.264 crf 17, **no audio**.
 - **Caption** at ~14% from the top, CAPS, left-aligned, words appear one by one (pop + blur-in). Key words sit on colored plates; a plate appears together with its word, never earlier. The caption is empty at the start of each line.
 - **Scene card** (one single frame, 920×640, at ~38% from the top) under the caption: a generic, unbranded **app-screen mockup** drawn in SVG that acts out the meaning of the line (chat, player, calendar, map, gallery, letter, monitor…). Every line gets a different screen and something must keep moving in it.
-- **Background**: per-scene vertical gradient + soft moving glow, sparkles, vignette, cross-faded between scenes. Hearts (some breaking) float up occasionally.
+- **Background**: per-scene vertical gradient + soft moving glow, sparkles, vignette, cross-faded between scenes. No floating hearts (the user asked to drop them): `hearts(t)` in the square template now draws drifting bokeh, rising light dust, a periodic diagonal light sweep and light film grain.
 - Everything is drawn in code (SVG, gradients, glow, shadows). No emoji, no photos, no brand logos or characters. Sounds and laughter are written as text ("пик", "тук", "ха-ха").
 
 ## Text rules

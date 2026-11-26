@@ -47,10 +47,15 @@ const heartIcon=(x,y,s,col,op=1,rot=0)=>`<g transform="translate(${f(x)} ${f(y)}
 function brokenIcon(x,y,s,col,op,rot,gap){const h=(sd,cl)=>`<g transform="translate(${f(sd*gap*9)} ${f(gap*3)}) rotate(${f(sd*gap*9)})"><path clip-path="url(#${cl})" d="${HP}" fill="${col}"/></g>`;
   return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)}) scale(${f(s/50)})" opacity="${f(op)}">${h(-1,'clipL')}${h(1,'clipR')}</g>`}
 const HEARTS=Array.from({length:30},(_,i)=>[0.8+i*1.9,[150,930,880,110,910,180,850,120,930,170][i%10],[40,34,44,32,38,46,34,40,44,34][i%10],i%4===0?0:1]);
-function hearts(t){let o='';HEARTS.forEach((h,i)=>{const age=t-h[0];if(age<0||age>7)return;
-  const y=1180-age/7*1350,x=h[1]+30*Math.sin(age*1.1+i),op=.85*Math.min(1,age/1,(7-age)/1.2),rot=8*Math.sin(age*.9+i);
-  o+=`<g filter="url(#fG)">`+((h[3]&&age>1.6)?brokenIcon(x,y,h[2],'#8a82b8',op*.7,rot,clamp((age-1.6)/1.6)):heartIcon(x,y,h[2],'#8a82b8',op*.7,rot))+`</g>`});
-  for(let i=0;i<46;i++){const sp=620+hash(i+9)*380,y=((t*sp+i*131)%2100)-80,x=(hash(i)*1200-60)-y*.12;o+=`<path d="M${f(x)} ${f(y)} l-6 34" stroke="#bcc8f0" stroke-opacity=".16" stroke-width="2.5" stroke-linecap="round"/>`}
+function hearts(t){let o='';
+  /* bokeh: soft glowing orbs drifting */
+  for(let i=0;i<14;i++){const r=26+hash(i+1)*70,x=(hash(i+2)*1180-50+18*Math.sin(t*.3+i))%1180,y=1120-((t*(10+hash(i+3)*16)+hash(i+4)*1200)%1240),op=(.05+.1*Math.pow(Math.sin(t*.7+i*1.7),2));o+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="url(#gSpark)" opacity="${f(op)}"/>`}
+  /* light dust rising */
+  for(let i=0;i<46;i++){const sp=22+hash(i+40)*40,y=1100-((t*sp+hash(i+41)*1150)%1150),x=hash(i+42)*1080+14*Math.sin(t*.9+i),tw=.25+.75*Math.abs(Math.sin(t*2.2+i*1.3));o+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(1.2+hash(i+43)*2.2)}" fill="#fff" opacity="${f(.55*tw)}"/>`}
+  /* diagonal light sweep every ~6.5s */
+  const ph=(t%6.5)/6.5;if(ph<.35){const p=ph/.35,x=lerp(-500,1500,p);o+=`<path d="M${f(x)} -100 L${f(x+180)} -100 L${f(x-420)} 1200 L${f(x-600)} 1200Z" fill="#fff" opacity="${f(.07*Math.sin(p*Math.PI))}"/>`}
+  /* film grain */
+  const g=Math.floor(t*24);for(let i=0;i<70;i++){o+=`<rect x="${f(hash(g*131+i)*1080)}" y="${f(hash(g*71+i+9)*1080)}" width="2" height="2" fill="#fff" opacity="${f(.05+.08*hash(g+i))}"/>`}
   return o}
 
 /* ---- backgrounds per scene: [top,bottom,glow] ---- */
