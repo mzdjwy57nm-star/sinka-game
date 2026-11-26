@@ -8,7 +8,7 @@ fps = int(sys.argv[6]) if len(sys.argv) > 6 else 30
 os.makedirs(out, exist_ok=True)
 with sync_playwright() as p:
     br = p.chromium.launch(executable_path=os.environ.get("PW_CHROME") or None, args=["--disable-gpu", "--force-color-profile=srgb"])
-    pg = br.new_context(viewport={"width": 1080, "height": 1920}, device_scale_factor=1).new_page()
+    pg = br.new_context(viewport={"width": 1080, "height": int(os.environ.get("VIEW_H", "1920"))}, device_scale_factor=1).new_page()
     pg.clock.install(time=0)  # freeze timers: only renderAt(t) moves things
     errs = []
     pg.on("pageerror", lambda e: errs.append(str(e)))

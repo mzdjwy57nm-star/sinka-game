@@ -37,6 +37,12 @@ Build a vertical lyric edit from pasted lyrics: one HTML page where every lyric 
 
 For partial changes (one scene redone), re-render only that scene's frame range into the existing frame folder and re-encode.
 
+## Square format (default since the user asked for it)
+
+- Use `assets/template-square.html`: 1080×1080 canvas, centered caption at the top, card scaled to 0.82 at y≈262, a progress bar with elapsed/remaining time under it, and a small "now playing" badge top-left (animated equalizer bars + `artist · title`). Set `NP={artist,title}` (escape `&` as `&amp;`). The SC array there ends right before the `/* ---- now playing` block.
+- Render with `VIEW_H=1080` (render.py reads it for the viewport height).
+- Ask for the artist and title if the user didn't give them.
+
 ## When the user sends the track (video or audio)
 
 1. Extract audio: `ffmpeg -i in.mp4 -vn -ac 1 -ar 16000 song.wav`.
