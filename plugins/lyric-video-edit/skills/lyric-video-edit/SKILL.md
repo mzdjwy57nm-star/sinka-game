@@ -43,6 +43,10 @@ For partial changes (one scene redone), re-render only that scene's frame range 
 - Render with `VIEW_H=1080` (render.py reads it for the viewport height).
 - Ask for the artist and title if the user didn't give them.
 
+## Beat-synced "jerky" mode (when the user asks for an edit under the beat / дёргано)
+
+Get beats with librosa (`beat_track`, units='time') into a `BEATS` array plus `beatAt(t)` (exp decay ~13/s, odd beats ×0.65). In `renderAt`: wrap the card in a group that on each beat jolts (±48/38 px), rotates (±3.5°) and punches scale (+8%); punch the background scale (+6%); make the caption jitter with skew and an RGB text-shadow split; stutter scene time on hits (`floor(lt*8)/8` while E>.55); add a `glitch(t,B)` overlay (white flash, colored glitch bars, scanlines every 4th beat). Reference: `lyric-video/tools/adiki/work.html`.
+
 ## When the user sends the track (video or audio)
 
 1. Extract audio: `ffmpeg -i in.mp4 -vn -ac 1 -ar 16000 song.wav`.
