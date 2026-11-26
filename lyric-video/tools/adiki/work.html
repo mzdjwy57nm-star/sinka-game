@@ -7,7 +7,7 @@ svg#main{position:absolute;left:0;top:0;width:1080px;height:1080px}
 svg text{font-family:'Fira Sans','Montserrat','Inter',sans-serif;font-weight:800}
 #cap{position:absolute;left:90px;top:112px;width:900px;display:flex;flex-wrap:wrap;justify-content:center;text-align:center;align-content:flex-start;
   font-family:'Fira Sans','Montserrat','Inter',sans-serif;font-weight:800;color:#fff;line-height:1.28;letter-spacing:.01em;gap:.1em .22em;text-shadow:0 2px 10px rgba(0,0,0,.45)}
-#cap .w{display:inline-block;transform-origin:50% 60%;white-space:nowrap}
+#cap .w{display:inline-block;transform-origin:50% 60%;white-space:nowrap;text-shadow:0 0 14px rgba(255,255,255,.75),0 0 38px rgba(255,255,255,.35)}
 #cap .p{display:inline-block;padding:0 .24em;border-radius:.2em;text-shadow:none;font-weight:900}
 </style></head>
 <body><div id="stage">
@@ -184,29 +184,43 @@ const capEl=document.getElementById('cap');let capIdx=-1,capWords=[];
 function parse(text){const toks=[];text.split(' ').forEach(w=>{const m=/^([#+]?)(.*?)([,.?!:;…]*)$/.exec(w);toks.push({mk:m[1],txt:m[2],tail:m[3]})});return toks}
 function buildCap(i){capEl.innerHTML='';capWords=[];let k=-1;const L=LINES[i];
   parse(L.t).forEach(tk=>{const w=document.createElement('span');w.className='w';
-    if(tk.mk){if(tk.mk==='#')k++;const c=PL[L.pc[Math.min(k,L.pc.length-1)]];const p=document.createElement('span');p.className='p';p.textContent=tk.txt;p.style.background=c[0];p.style.color=c[1];p.style.boxShadow=`0 0 28px ${c[0]}99`;w.appendChild(p);if(tk.tail)w.appendChild(document.createTextNode(tk.tail));}
+    if(tk.mk){w.textContent=tk.txt+tk.tail;w.dataset.acc=tk.txt;}
     else w.textContent=tk.txt+tk.tail;
     w.style.opacity=0;capEl.appendChild(w);capWords.push(w)});
   let fs=52;capEl.style.fontSize=fs+'px';while(capEl.offsetHeight>136&&fs>32){fs-=2;capEl.style.fontSize=fs+'px'}}
 function lineAt(t){let i=0;for(let j=0;j<LINES.length;j++)if(t>=LINES[j].st)i=j;return i}
 const bgEl=document.getElementById('bgLayer'),pEl=document.getElementById('panelG');
+function accentFx(t,i){const L=LINES[i],lt=t-L.st;let o='',hit=0;const cy=112+capEl.offsetHeight/2;
+  const acc=[];capWords.forEach((w,j)=>{if(w.dataset.acc)acc.push([L.ws?L.ws[j]:W0+WORD*j,w.dataset.acc])});
+  acc.forEach((a,k)=>{const st=a[0],en=k<acc.length-1?acc[k+1][0]-.02:L.d-.06,u=lt-st;if(u<0||lt>en)return;
+    const txt=a[1].replace(/[«»"]/g,''),size=Math.min(150,1000/(txt.length*.58)),inn=eo(u/.12),out=clamp((lt-(en-.16))/.16);
+    const sy=Math.max(.04,inn*(1-out)+.04*out),sx=lerp(1,1.3,out)*lerp(1.25,1,inn),sm=(1-inn)+out;hit=Math.max(hit,Math.exp(-u*10));
+    const base=`font-size="${f(size)}" text-anchor="middle" style="font-weight:900;letter-spacing:-2px" fill="#ff2a3a"`;
+    let g=`<g transform="translate(540 ${f(cy)}) scale(${f(sx*.86)} ${f(sy)}) translate(0 ${f(size*.36)})">`;
+    g+=`<text ${base} opacity=".55" style="filter:blur(14px)">${txt}</text>`;
+    if(sm>.05)for(const dx of[-40,-20,20,40])g+=`<text x="${dx*sm}" ${base} opacity="${f(.25*sm)}">${txt}</text>`;
+    g+=`<text ${base} filter="url(#fG)">${txt}</text></g>`;
+    if(out>0&&out<1)g+=`<rect x="${f(540-500*lerp(1,1.3,out))}" y="${f(cy-3)}" width="${f(1000*lerp(1,1.3,out))}" height="6" fill="#ff2a3a" opacity="${f(1-out)}" filter="url(#fG)"/>`;
+    o+=g});
+  return{svg:o,hit}}
 function renderAt(t){
   const i=lineAt(t),lt0=t-LINES[i].st;
-  const B=beatAt(t),E=B.e,F30=Math.floor(t*30),jx=(hash(B.bi*7+1)-.5)*48*E+(hash(F30)-.5)*4,jy=(hash(B.bi*7+2)-.5)*38*E+(hash(F30+9)-.5)*4,jr=(hash(B.bi*7+3)-.5)*7*E,js=1+.08*E;
+  if(i!==capIdx){buildCap(i);capIdx=i}
+  const B=beatAt(t),E=B.e,A=accentFx(t,i),H=A.hit;
   let b='';if(i>0&&lt0<FADE){b=bgScene(i-1,t,1)+bgScene(i,t,ease(lt0/FADE))}else b=bgScene(i,t,1);
-  bgEl.innerHTML=`<g transform="translate(540 540) scale(${f(1+.06*E)}) translate(-540 -540)">`+b+hearts(t)+`</g><rect width="1080" height="1080" fill="url(#vig)"/>`;
-  let p=`<g transform="translate(${f(540+jx)} ${f(560+jy)}) rotate(${f(jr)}) scale(${f(js)}) translate(-540 -560)"><g transform="translate(163 262) scale(.82)">`;
+  const push=1.02+.06*clamp(lt0/LINES[i].d)+.015*E;
+  bgEl.innerHTML=`<g transform="translate(540 540) scale(${f(push)}) translate(-540 -540)">`+b+hearts(t)+`</g><rect width="1080" height="1080" fill="url(#vig)"/>`;
+  const cs=1+.012*E+.035*H;
+  let p=`<g transform="translate(540 560) scale(${f(cs)}) translate(-540 -560)"><g transform="translate(163 262) scale(.82)">`;
   LINES.forEach((l,j)=>{const lt=t-l.st;if(lt<-1e-6||lt>l.d+FADE)return;
     const last=j===LINES.length-1,fi=clamp(lt/FADE),fo=last?1:clamp((l.d+FADE-lt)/FADE),op=Math.min(fi,fo);
-    const dy=(1-eo(fi))*30-(1-fo)*20,bl=(1-fi)*14+(1-fo)*14;
-    p+=`<g opacity="${f(op)}" transform="translate(0 ${f(dy)})" style="filter:blur(${f(bl)}px)">${shell(l.theme,l.draw(E>.55?Math.floor(lt*8)/8:lt))}</g>`});
+    const sc=lerp(1.08,1,eo(fi))*lerp(.96,1,fo),bl=(1-fi)*16+(1-fo)*16;
+    p+=`<g opacity="${f(op)}" transform="translate(460 320) scale(${f(sc)}) translate(-460 -320)" style="filter:blur(${f(bl)}px)">${shell(l.theme,l.draw(lt))}</g>`});
   pEl.innerHTML=p+`</g></g>`;
-  document.getElementById('npG').innerHTML=nowPlaying(t)+glitch(t,B);
-  capEl.style.transform=`translate(${f(jx*.5)}px,${f(jy*.4)}px) skewX(${f(jr*2)}deg)`;capEl.style.textShadow=E>.08?`${f(7*E)}px 0 rgba(255,40,90,.85),${f(-7*E)}px 0 rgba(40,220,255,.85),0 2px 10px rgba(0,0,0,.45)`:'0 2px 10px rgba(0,0,0,.45)';
-  if(i!==capIdx){buildCap(i);capIdx=i}
+  document.getElementById('npG').innerHTML=A.svg+nowPlaying(t)+(H>.02?`<rect width="1080" height="1080" fill="#fff" opacity="${f(.10*H)}"/>`:'');
   const lt=lt0;
-  capWords.forEach((w,j)=>{const ws=LINES[i].ws?LINES[i].ws[j]:W0+WORD*j,u=(lt-ws)/.16;if(u<0){w.style.opacity=0;return}
-    const bb=backO(u);w.style.opacity=Math.min(1,u*4);w.style.transform=`translateY(${(1-bb)*12}px) scale(${.82+.18*bb})`;w.style.filter=u<1?`blur(${f((1-clamp(u))*6)}px)`:'none'});
+  capWords.forEach((w,j)=>{const ws=LINES[i].ws?LINES[i].ws[j]:W0+WORD*j,u=(lt-ws)/.14;if(u<0){w.style.opacity=0;return}
+    const e=eo(u);w.style.opacity=Math.min(1,u*3);w.style.transform=`scale(${f(lerp(1.35,1,e))})`;w.style.filter=u<1?`blur(${f((1-clamp(u))*10)}px)`:'none'});
 }
 window.TOTAL=TOTAL;window.renderAt=renderAt;window.LINES=LINES;
 document.fonts.ready.then(()=>{renderAt(0);window.READY=true});

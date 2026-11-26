@@ -43,9 +43,12 @@ For partial changes (one scene redone), re-render only that scene's frame range 
 - Render with `VIEW_H=1080` (render.py reads it for the viewport height).
 - Ask for the artist and title if the user didn't give them.
 
-## Beat-synced "jerky" mode (when the user asks for an edit under the beat / дёргано)
+## Effects style (from the user's reference — use this instead of random shaking)
 
-Get beats with librosa (`beat_track`, units='time') into a `BEATS` array plus `beatAt(t)` (exp decay ~13/s, odd beats ×0.65). In `renderAt`: wrap the card in a group that on each beat jolts (±48/38 px), rotates (±3.5°) and punches scale (+8%); punch the background scale (+6%); make the caption jitter with skew and an RGB text-shadow split; stutter scene time on hits (`floor(lt*8)/8` while E>.55); add a `glitch(t,B)` overlay (white flash, colored glitch bars, scanlines every 4th beat). Reference: `lyric-video/tools/adiki/work.html`.
+- Caption words: white, heavy, soft white glow (`text-shadow` 14px + 38px); each word pops in with blur 10→0 and scale 1.35→1 in ~0.14 s. No colored plates.
+- Accent words (`#WORD` in `t`): a huge red (#ff2a3a) glowing copy of the word behind the caption, condensed (scaleX .86), that stretches in from a thin horizontal line (scaleY .04→1, smeared copies) on the word, holds until the next accent or line end, then collapses back into a red line and vanishes. Small white flash + 3.5% card zoom punch on the hit.
+- Card transitions: zoom 1.08→1 with blur in, slight shrink + blur out. Background: slow push-in per line + tiny beat breathe. No rotation/jitter/glitch bars.
+- Reference implementation: `accentFx` + `renderAt` in `lyric-video/tools/adiki/work.html`.
 
 ## When the user sends the track (video or audio)
 
