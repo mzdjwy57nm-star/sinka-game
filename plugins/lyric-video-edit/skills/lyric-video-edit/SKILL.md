@@ -33,7 +33,7 @@ Build a vertical lyric edit from pasted lyrics: one HTML page where every lyric 
 3. Write each `draw(lt)` as a pure function of local time `lt` (seconds since the line started) returning an SVG string in card coordinates (920×640). Use the helpers listed in `references/template-api.md`. Plan a mini-story per scene: setup → change → payoff (e.g. messages arrive → "прочитано" → he starts typing and deletes it).
 4. Test: render ~2 frames per scene (at ~35% and ~80% of each line) with `scripts/render.py`, tile them into a contact sheet with ffmpeg, look at it, fix overlaps, overflow, and JS errors (the renderer prints console errors).
 5. Full build: `scripts/build.sh work.html out.mp4` (renders all frames in two processes, encodes, writes a contact sheet). Check the sheet, then send the MP4.
-6. Final message: what is in each scene in one line each, which lines were treated neutrally, typo fixes, and that the card texts are invented.
+6. Send the MP4 with no write-up afterwards: the user does not want scene descriptions. At most one short line if something needs their attention (e.g. a line missing from the audio).
 
 For partial changes (one scene redone), re-render only that scene's frame range into the existing frame folder and re-encode.
 
