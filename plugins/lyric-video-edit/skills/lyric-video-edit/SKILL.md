@@ -37,7 +37,11 @@ Build a vertical lyric edit from pasted lyrics: one HTML page where every lyric 
 
 For partial changes (one scene redone), re-render only that scene's frame range into the existing frame folder and re-encode.
 
-## Light minimal style (CURRENT DEFAULT — user's latest reference)
+## Minimal style (CURRENT DEFAULT) — dark variant preferred now
+
+The user switched back to a DARK theme but wants everything else from the minimal reference (small sentence-case caption with focus-in, high scene frequency, now-playing badge, sparing red accents, card or frameless widgets). Use `assets/template-dark-min.html` (scenes: theme:'dark', text #f4f4f8, sub #8a8a96, fields #1e1e28, cards #16161e). `assets/template-light.html` is the same thing on light grey.
+
+### Light variant details
 
 Use `assets/template-light.html` (square 1080×1080, render with `VIEW_H=1080`):
 - Plain light-grey background (#efeff2), no particles, no glow, no hearts, no vignette, no progress bar.

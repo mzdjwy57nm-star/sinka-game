@@ -53,7 +53,7 @@ function hearts(t){return ''}
 const BGS=[['#06080f','#1c2440','#5a6a9a'],['#0a0a0c','#3a3428','#8a7a60'],['#0c0608','#3a1c24','#8a4a5a'],['#0c0810','#40283a','#8a5a7a'],
  ['#060a0e','#1c3038','#5a8090'],['#0a0810','#30284a','#6a5a8a'],['#0c0a08','#403020','#8a7050'],['#060a14','#243050','#5a6a90'],['#060a0c','#223a38','#5a8a80']];
 document.getElementById('main').querySelector('defs').insertAdjacentHTML('beforeend',BGS.map((b,i)=>`<linearGradient id="bgS${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${b[0]}"/><stop offset=".42" stop-color="${b[0]}"/><stop offset="1" stop-color="${b[1]}"/></linearGradient><radialGradient id="glS${i}"><stop offset="0" stop-color="${b[2]}" stop-opacity=".5"/><stop offset="1" stop-color="${b[2]}" stop-opacity="0"/></radialGradient>`).join(''));
-function bgScene(i,t,op){return `<g opacity="${f(op)}"><rect width="1080" height="1080" fill="#efeff2"/><circle cx="540" cy="560" r="620" fill="#fff" opacity=".55" filter="url(#fS)"/></g>`}
+function bgScene(i,t,op){return `<g opacity="${f(op)}"><radialGradient id="bgR" cx=".5" cy=".52" r=".6"><stop offset="0" stop-color="#ffffff" stop-opacity=".8"/><stop offset="1" stop-color="#efeff2"/></radialGradient><rect width="1080" height="1080" fill="url(#bgR)"/></g>`}
 
 /* ---- ui helpers (card-local 920x640) ---- */
 const CW=920,CH=640;
