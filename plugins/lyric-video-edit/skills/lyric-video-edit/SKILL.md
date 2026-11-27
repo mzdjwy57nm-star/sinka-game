@@ -44,7 +44,7 @@ The user switched back to a DARK theme but wants everything else from the minima
 Dark-minimal extras (from the user's latest reference, all in `template-dark-min.html`):
 - Per-scene colored glow behind the card with drifting sparks: set `glow:'#hex'` on a scene (defaults cycle through GLOW).
 - NO 3D corner objects: the user asked to remove them (obj3d is no longer called; don't add `obj`).
-- Light film grain + vignette on top. Transitions stay blur+scale (no swipe).
+- No grain/vignette. Strong per-scene color glow (like the reference). Caption bigger (~52px): the whole line is visible faint+blurred from the start, sung words light up. Small pill player at the bottom center (icon, artist/title or 'Lyrics · Now Playing', equalizer, progress, time) instead of the top-left badge. Use `odo()` for odometer-style rolling numbers on counters. Red stretch accents stay (sparingly). Transitions blur+scale.
 
 ### Light variant details
 
