@@ -4,7 +4,7 @@
 set -e
 PAGE="$1"; OUT="$2"; DIR="$(cd "$(dirname "$0")" && pwd)"; FR=$(mktemp -d)
 N=$(python3 - "$PAGE" <<'PY'
-import re,sys;s=open(sys.argv[1]).read();print(round(sum(float(x) for x in re.findall(r'\{d:([\d.]+),theme',s))*30))
+import re,sys;s=open(sys.argv[1]).read();print(round(sum(float(x) for x in re.findall(r"\{d:([\d.]+),",s))*30))
 PY
 )
 python3 "$DIR/render.py" "$PAGE" "$FR" 0 "$N" 2 & python3 "$DIR/render.py" "$PAGE" "$FR" 1 "$N" 2 & wait
