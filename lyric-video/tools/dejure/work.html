@@ -87,54 +87,63 @@ const floatCard=(x,y,w,h,inner,rot=0)=>`<g transform="rotate(${f(rot)} ${x+w/2} 
 const av=(x,y,r,col)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${col}"/><circle cx="${x}" cy="${f(y-r*.18)}" r="${f(r*.38)}" fill="#fff" opacity=".8"/><path d="M${f(x-r*.62)} ${f(y+r*.62)} Q${x} ${f(y+r*.05)} ${f(x+r*.62)} ${f(y+r*.62)}" fill="#fff" opacity=".8"/>`;
 const crate=(cx,cy,u,label)=>`<g transform="translate(${cx} ${cy}) scale(${f(backO(u))})"><rect x="-200" y="-110" width="400" height="220" rx="18" fill="#2a2a1e" stroke="#4a4a32" stroke-width="5"/><path d="M-200 -40 H200 M-200 40 H200" stroke="#3a3a28" stroke-width="5"/><rect x="-30" y="-24" width="60" height="48" rx="8" fill="#8a8a6a"/><path d="M-16 -24 V-38 Q0 -56 16 -38 V-24" stroke="#8a8a6a" stroke-width="7" fill="none"/>`+T(0,94,label,40,{a:'middle',w:900,fill:'#c8c8a0',ls:4,ff:"'JetBrains Mono',monospace"})+`</g>`;
 const SC=[
-{d:1.26,theme:'dark',t:"Мой отец — #бандит,",obj:'pin',glow:'#ff3b4a',pc:['rd'],ws:[.30,.64,.86,1.02],
+{d:1.26,theme:'dark',t:"Мой отец — #бандит,",obj:'mask',glow:'#ff3b4a',pc:['rd'],ws:[.30,.64,.86,1.02],
  draw:lt=>{let o=av(220,300,90,'#3a3a48')+T(360,280,'Папа',56,{w:900,fill:INK})+T(360,330,'контакт',24,{w:600,fill:SUB});
   if(lt>=1.02)o+=`<g transform="translate(560 430) rotate(-6) scale(${f(lerp(2,1,eo((lt-1.02)*5)))})" opacity="${f(clamp((lt-1.02)*6))}"><rect x="-150" y="-40" width="300" height="80" rx="10" fill="none" stroke="${RD}" stroke-width="6"/>`+T(0,16,'БАНДИТ',44,{a:'middle',w:900,fill:RD})+`</g>`;
   return o}},
-{d:1.66,frame:false,t:"я не такой, как папа",obj:'arrows',glow:'#3a6bff',pc:['rd'],ws:[.12,.24,.46,.84,.98],
+{d:1.66,frame:false,t:"я не такой, как папа",obj:'neq',glow:'#3a6bff',pc:['rd'],ws:[.12,.24,.46,.84,.98],
  draw:lt=>{const c1=eo((lt-.1)/.25),c2=eo((lt-.9)/.25);let o=`<g opacity="${f(c1)}">`+floatCard(120,200,300,300,av(270,320,70,'#4a4a5a')+T(270,450,'я',32,{a:'middle',w:900,fill:INK}),-3)+`</g>`;
   o+=`<g opacity="${f(c2)}">`+floatCard(500,200,300,300,av(650,320,70,'#3a3a48')+T(650,450,'папа',32,{a:'middle',w:900,fill:SUB}),3)+`</g>`;
   if(lt>=.46)o+=T(460,385,'≠',90,{a:'middle',w:900,fill:RD,op:clamp((lt-.46)/.2)});return o}},
-{d:1.22,frame:false,t:"АК-47,",obj:'crate',glow:'#f5a623',pc:['rd'],ws:[.12],draw:lt=>crate(460,330,(lt-.05)/.25,'АК-47')},
-{d:0.40,frame:false,t:"СВД",obj:'crate',glow:'#f5a623',pc:['rd'],ws:[.06],draw:lt=>crate(460,330,(lt)/.18,'СВД')},
-{d:1.06,frame:false,t:"и Макаров",obj:'lock',glow:'#f5a623',pc:['rd'],ws:[.10,.32],draw:lt=>crate(460,330,(lt-.2)/.22,'МАКАРОВ')+T(460,520,'×3 на складе',24,{a:'middle',w:700,fill:SUB,op:clamp((lt-.5)/.2)})},
+{d:1.22,frame:false,t:"АК-47,",obj:'helmet',glow:'#f5a623',pc:['rd'],ws:[.12],draw:lt=>crate(460,330,(lt-.05)/.25,'АК-47')},
+{d:0.40,frame:false,t:"СВД",obj:'crosshair',glow:'#f5a623',pc:['rd'],ws:[.06],draw:lt=>crate(460,330,(lt)/.18,'СВД')},
+{d:1.06,frame:false,t:"и Макаров",obj:'redstar',glow:'#f5a623',pc:['rd'],ws:[.10,.32],draw:lt=>crate(460,330,(lt-.2)/.22,'МАКАРОВ')+T(460,520,'×3 на складе',24,{a:'middle',w:700,fill:SUB,op:clamp((lt-.5)/.2)})},
 {d:1.26,theme:'dark',t:"Мои деньги чистые,",obj:'coin',glow:'#2fbf71',pc:['rd'],ws:[.12,.34,.62],
  draw:lt=>{let o=T(60,90,'БАЛАНС',18,{ls:3,fill:SUB})+T(60,200,fmt(Math.round(lerp(0,4800000,ease(lt/.9))))+' ₽',72,{w:900,fill:INK});
   for(let k=0;k<5;k++)o+=`<rect x="${160+k*20}" y="${400-k*26}" width="300" height="70" rx="8" fill="#1f5a3a" stroke="${GR}" stroke-width="2"/>`;
   for(let k=0;k<6;k++){const ph=(lt*1.5+k*.3)%1;if(lt>.6)o+=sparkle(+(560+hash(k)*260).toFixed(0),+(260+hash(k+3)*220).toFixed(0),+(8+12*Math.sin(ph*Math.PI)).toFixed(1),Math.sin(ph*Math.PI))}
   if(lt>=.62)o+=T(860,560,'проверено: чисто',24,{a:'end',w:800,fill:GR,op:clamp((lt-.62)/.2)});return o}},
-{d:1.46,theme:'dark',t:"я делал это #грязно",obj:'drop',glow:'#9b7bff',pc:['rd'],ws:[.12,.26,.58,.72],
+{d:1.46,theme:'dark',t:"я делал это #грязно",obj:'mud',glow:'#9b7bff',pc:['rd'],ws:[.12,.26,.58,.72],
  draw:lt=>{let o=T(60,90,'СПОСОБ',18,{ls:3,fill:SUB})+T(60,200,lt>=.72?'грязно':'…',80,{w:900,fill:lt>=.72?RD:INK});
   for(let k=0;k<7;k++){const u=clamp((lt-.72-k*.06)/.15);if(u<=0)continue;const x=120+hash(k)*680,y=260+hash(k+5)*300,r=30+hash(k+9)*50;o+=`<g transform="translate(${f(x)} ${f(y)}) scale(${f(u)})"><circle r="${f(r)}" fill="#3a2a1a"/>`+[0,1,2,3].map(j=>`<circle cx="${f(Math.cos(j*1.6+k)*r*1.2)}" cy="${f(Math.sin(j*1.6+k)*r*1.2)}" r="${f(r*.25)}" fill="#3a2a1a"/>`).join('')+`</g>`}
   return o}},
-{d:0.92,theme:'dark',t:"Они предавали,",obj:'heart',glow:'#ff5c9c',pc:['rd'],ws:[.12,.30],
+{d:0.92,theme:'dark',t:"Они предавали,",obj:'brokenheart',glow:'#ff5c9c',pc:['rd'],ws:[.12,.30],
  draw:lt=>{let o=T(60,90,'КОНТАКТЫ',18,{ls:3,fill:SUB});for(let k=0;k<4;k++){const y=130+k*105,u=clamp((lt-.3-k*.1)/.15);o+=`<rect x="60" y="${y}" width="800" height="88" rx="22" fill="${FLD}"/>`+av(120,y+44,28,'#3a3a48')+`<rect x="170" y="${y+30}" width="${160+k*40}" height="26" rx="13" fill="#2a2a36"/>`;if(u>0)o+=`<g opacity="${f(u)}"><rect x="660" y="${y+24}" width="170" height="40" rx="20" fill="${RD}"/>`+T(745,y+51,'предатель',20,{a:'middle',w:900,fill:'#fff'})+`</g>`}
   return o}},
-{d:2.16,frame:false,t:"но возвращались #обратно",obj:'check',glow:'#38c8ff',pc:['rd'],ws:[.12,.22,.98],
+{d:2.16,frame:false,t:"но возвращались #обратно",obj:'boomerang',glow:'#38c8ff',pc:['rd'],ws:[.12,.22,.98],
  draw:lt=>{let o=floatCard(160,150,600,400,'',0);const cx=460,cy=350,a=lt*3;o+=`<circle cx="${cx}" cy="${cy}" r="140" fill="none" stroke="#2a2a36" stroke-width="16"/><path d="M${cx+140} ${cy} A140 140 0 1 1 ${f(cx+140*Math.cos(-.6))} ${f(cy+140*Math.sin(-.6))}" stroke="${RD}" stroke-width="16" fill="none" stroke-linecap="round" transform="rotate(${f(a*57)} ${cx} ${cy})"/>`;
   for(let k=0;k<4;k++){const p=clamp((lt-.3-k*.2)/.6),ang=lerp(0,Math.PI*2,eo(p))+k;const r=lerp(260,0,eo(p));if(p<1)o+=`<g opacity="${f(clamp(p*3))}">`+av(cx+Math.cos(ang)*r,cy+Math.sin(ang)*r,24,'#4a4a5a')+`</g>`}
   if(lt>=.98)o+=T(cx,cy+14,'вернулись',30,{a:'middle',w:900,fill:INK,op:clamp((lt-.98)/.2)})+ringsAt(cx,cy,lt-.98,RD,220);return o}},
 ];
-/* ---- glossy 3D corner objects (SVG, no emoji) ---- */
-function g3(id,c1,c2){return `<radialGradient id="${id}" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></radialGradient>`}
-const HL=`<ellipse cx="-14" cy="-20" rx="14" ry="8" fill="#fff" opacity=".55" transform="rotate(-30 -14 -20)"/>`;
+/* ---- 3D corner objects: extruded shape + lit front + rim + specular + contact shadow ---- */
+let _gid=0;
+function ext(d,c1,c2,side,depth=12,extra=''){const id='x3'+(_gid++);let o=`<linearGradient id="${id}" x1="0" y1="0" x2=".6" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>`;
+  for(let k=depth;k>=1;k--)o+=`<path d="${d}" fill="${side}" fill-rule="evenodd" transform="translate(${f(k*.35)} ${f(k*.9)})" opacity="${f(.85+.15*(1-k/depth))}"/>`;
+  o+=`<path d="${d}" fill="url(#${id})" fill-rule="evenodd"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="2.5" fill-rule="evenodd" transform="translate(-.6 -1.2)"/>`+extra;return o}
+const spec=(x,y,rx,ry,rot=-25,op=.6)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="#fff" opacity="${op}" transform="rotate(${rot} ${x} ${y})" style="filter:blur(1.5px)"/>`;
+const HEARTD="M0 38 C-58 0 -44 -48 0 -20 C44 -48 58 0 0 38Z";
 const OBJ={
- heart:()=>g3('o_h','#ff7a8a','#b0102a')+`<path d="M0 34 C-56 -2 -40 -46 0 -18 C40 -46 56 -2 0 34Z" fill="url(#o_h)"/>`+HL,
- star:()=>g3('o_s','#fff4a0','#e0a800')+`<polygon points="0,-46 13,-14 46,-12 20,8 29,42 0,22 -29,42 -20,8 -46,-12 -13,-14" fill="url(#o_s)" stroke="#c08a00" stroke-width="2" stroke-linejoin="round"/>`+HL,
- spark:()=>g3('o_k','#fffbe8','#e8d6a0')+`<path d="M0 -48 Q8 -8 48 0 Q8 8 0 48 Q-8 8 -48 0 Q-8 -8 0 -48Z" fill="url(#o_k)"/>`,
- pin:()=>g3('o_p','#ff6a7a','#a01020')+`<path d="M0 50 C-30 10 -40 -6 -40 -16 C-40 -40 -22 -54 0 -54 C22 -54 40 -40 40 -16 C40 -6 30 10 0 50Z" fill="url(#o_p)"/><circle cy="-18" r="13" fill="#7a0a18"/>`+HL,
- moon:()=>g3('o_m','#fffbe0','#d8c890')+`<path d="M18 -44 A46 46 0 1 0 30 34 A38 38 0 1 1 18 -44Z" fill="url(#o_m)"/>`,
- lock:()=>g3('o_l','#ffe08a','#b08020')+`<path d="M-20 -6 V-24 Q0 -50 20 -24 V-6" stroke="#9aa0b0" stroke-width="10" fill="none"/><rect x="-32" y="-8" width="64" height="52" rx="10" fill="url(#o_l)"/><circle cy="14" r="6" fill="#6a4a10"/>`,
- check:()=>g3('o_c','#7af0a8','#16904a')+`<path d="M-40 0 L-12 30 L44 -34" stroke="url(#o_c)" stroke-width="22" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
- cloud:()=>g3('o_d','#ffffff','#b8c0d8')+`<path d="M-40 24 Q-62 24 -58 4 Q-56 -16 -34 -14 Q-28 -40 0 -40 Q30 -40 34 -14 Q60 -18 58 6 Q56 24 36 24Z" fill="url(#o_d)"/>`,
- bolt:()=>g3('o_b','#fff07a','#e09a00')+`<path d="M8 -50 L-30 6 H-4 L-12 50 L30 -8 H4Z" fill="url(#o_b)" stroke="#b07000" stroke-width="2" stroke-linejoin="round"/>`,
- coin:()=>g3('o_o','#fff0a0','#c89010')+`<ellipse rx="40" ry="44" fill="url(#o_o)" stroke="#a87a10" stroke-width="4"/><text y="16" text-anchor="middle" font-size="44" style="font-weight:900" fill="#8a6010">₽</text>`,
- crate:()=>g3('o_r','#8a8a6a','#3a3a28')+`<rect x="-40" y="-34" width="80" height="68" rx="8" fill="url(#o_r)"/><path d="M-40 -10 H40 M-40 12 H40" stroke="#2a2a1c" stroke-width="4"/>`,
- drop:()=>g3('o_w','#c8eaff','#3a8ad0')+`<path d="M0 -48 C24 -16 34 2 34 18 C34 38 18 50 0 50 C-18 50 -34 38 -34 18 C-34 2 -24 -16 0 -48Z" fill="url(#o_w)"/>`+HL,
- hourglass:()=>g3('o_g','#ffe6a0','#c8902a')+`<rect x="-34" y="-50" width="68" height="10" rx="4" fill="#8a5a1a"/><rect x="-34" y="40" width="68" height="10" rx="4" fill="#8a5a1a"/><path d="M-26 -40 H26 Q26 -10 4 0 Q26 10 26 40 H-26 Q-26 10 -4 0 Q-26 -10 -26 -40Z" fill="url(#o_g)" opacity=".9"/>`,
- arrows:()=>g3('o_a','#9ae0ff','#2a6ab0')+`<path d="M-36 -10 A38 38 0 0 1 30 -22 L40 -32 L42 4 L8 0 L20 -10 A26 26 0 0 0 -24 -4Z M36 10 A38 38 0 0 1 -30 22 L-40 32 L-42 -4 L-8 0 L-20 10 A26 26 0 0 0 24 4Z" fill="url(#o_a)"/>`,
+ heart:()=>ext(HEARTD,'#ff8090','#c8102e','#6e0818',12,spec(-20,-18,14,7)),
+ brokenheart:()=>`<g transform="translate(-7 3) rotate(-8)">`+ext("M0 38 C-58 0 -44 -48 0 -20 L-8 -4 L4 8 L-6 22Z",'#ff8090','#c8102e','#6e0818',12,spec(-22,-18,12,6))+`</g><g transform="translate(9 6) rotate(9)">`+ext("M0 -20 C44 -48 58 0 0 38 L-6 22 L4 8 L-8 -4Z",'#ff8090','#c8102e','#6e0818',12)+`</g>`,
+ star:()=>ext("M0 -48 L14 -15 L49 -13 L22 9 L31 44 L0 24 L-31 44 L-22 9 L-49 -13 L-14 -15Z",'#fff2a0','#f0a800','#9a6a00',10,spec(-10,-22,10,5)),
+ redstar:()=>ext("M0 -48 L14 -15 L49 -13 L22 9 L31 44 L0 24 L-31 44 L-22 9 L-49 -13 L-14 -15Z",'#ff7a7a','#c8101e','#6a0810',10,spec(-10,-22,10,5)),
+ mask:()=>ext("M-60 -6 C-54 -34 -22 -32 0 -18 C22 -32 54 -34 60 -6 C62 18 32 32 12 18 C6 14 -6 14 -12 18 C-32 32 -62 18 -60 -6Z M-38 -4 C-30 -16 -16 -12 -14 -2 C-18 8 -32 8 -38 -4Z M38 -4 C30 -16 16 -12 14 -2 C18 8 32 8 38 -4Z",'#4a4a58','#121218','#05050a',10,spec(-36,-20,12,5,-15,.45)),
+ neq:()=>ext("M-46 -26 H46 Q54 -26 54 -18 V-10 Q54 -2 46 -2 H-46 Q-54 -2 -54 -10 V-18 Q-54 -26 -46 -26Z M-46 6 H46 Q54 6 54 14 V22 Q54 30 46 30 H-46 Q-54 30 -54 22 V14 Q-54 6 -46 6Z",'#7aa0ff','#2a50d0','#142a70',10)+`<g>`+ext("M16 -52 L28 -46 L-16 54 L-28 48Z",'#ff7a8a','#d0102a','#6a0818',10)+`</g>`,
+ helmet:()=>ext("M-52 16 C-52 -30 -26 -46 0 -46 C26 -46 52 -30 52 16 H64 Q68 26 58 28 H-58 Q-68 26 -64 16Z",'#8a9a5a','#3e4a22','#222a12',12,spec(-20,-28,16,7)+`<path d="M-52 10 H52" stroke="#2a3216" stroke-width="3" opacity=".6"/>`),
+ crosshair:()=>ext("M0 -46 A46 46 0 1 1 -.01 -46Z M0 -34 A34 34 0 1 0 .01 -34Z",'#ff7a7a','#c8101e','#6a0810',8)+ext("M-4 -60 H4 V-24 H-4Z M-4 24 H4 V60 H-4Z M-60 -4 H-24 V4 H-60Z M24 -4 H60 V4 H24Z",'#ffffff','#c8c8d4','#6a6a78',6)+ext("M0 -7 A7 7 0 1 1 -.01 -7Z",'#ff7a7a','#c8101e','#6a0810',5),
+ coin:()=>{let o='';for(let k=14;k>=1;k--)o+=`<ellipse cx="${f(k*.3)}" cy="${f(k*.9)}" rx="44" ry="46" fill="${k>12?'#7a5a08':'#b88a10'}"/>`;return o+`<radialGradient id="cnF" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff2a0"/><stop offset="1" stop-color="#d89a10"/></radialGradient><ellipse rx="44" ry="46" fill="url(#cnF)"/><ellipse rx="34" ry="36" fill="none" stroke="#b07a08" stroke-width="3"/><text y="17" text-anchor="middle" font-size="48" style="font-weight:900" fill="#a06a00">₽</text>`+spec(-16,-22,12,6)},
+ mud:()=>ext("M-10 -42 C8 -46 18 -30 30 -32 C48 -34 56 -14 44 0 C58 12 46 36 26 30 C18 44 -4 48 -14 34 C-34 42 -54 24 -42 8 C-58 -6 -42 -28 -26 -22 C-26 -34 -20 -40 -10 -42Z",'#8a6a4a','#4a3220','#2a1c10',10,spec(-14,-20,12,6,-20,.45)),
+ boomerang:()=>ext("M-54 30 Q-44 -34 0 -48 Q44 -34 54 30 Q44 38 32 28 Q24 -14 0 -24 Q-24 -14 -32 28 Q-44 38 -54 30Z",'#f0c070','#b06a20','#5a3410',12,spec(-24,-24,12,5,-40,.5)),
+ pin:()=>ext("M0 52 C-30 12 -40 -4 -40 -16 C-40 -40 -22 -54 0 -54 C22 -54 40 -40 40 -16 C40 -4 30 12 0 52Z M0 -32 A13 13 0 1 0 .01 -32Z",'#ff7a8a','#c8102e','#6a0818',12,spec(-16,-34,10,5)),
+ moon:()=>ext("M18 -46 A48 48 0 1 0 32 36 A40 40 0 1 1 18 -46Z",'#fffbe0','#d8c070','#8a7a30',10),
+ check:()=>ext("M-46 -2 L-34 -14 L-12 8 L32 -40 L46 -28 L-12 32Z",'#7af0a8','#16904a','#0a4a24',10),
+ cloud:()=>ext("M-40 26 Q-64 26 -60 4 Q-58 -18 -34 -16 Q-28 -42 0 -42 Q32 -42 36 -16 Q62 -20 60 6 Q58 26 36 26Z",'#ffffff','#b8c2dc','#6a7490',10),
+ bolt:()=>ext("M8 -52 L-32 6 H-4 L-12 52 L32 -8 H4Z",'#fff07a','#e09a00','#7a5000',10),
+ lock:()=>ext("M-20 -8 V-24 Q-20 -46 0 -46 Q20 -46 20 -24 V-8 H12 V-24 Q12 -38 0 -38 Q-12 -38 -12 -24 V-8Z",'#e8eaf2','#8a90a0','#4a4e5a',8)+ext("M-34 -8 H34 Q40 -8 40 -2 V40 Q40 46 34 46 H-34 Q-40 46 -40 40 V-2 Q-40 -8 -34 -8Z",'#ffe08a','#c08a20','#6a4a10',10,`<circle cy="16" r="7" fill="#6a4a10"/>`),
+ drop:()=>ext("M0 -50 C24 -16 34 2 34 18 C34 38 18 50 0 50 C-18 50 -34 38 -34 18 C-34 2 -24 -16 0 -50Z",'#c8eaff','#2a7ad0','#103a70',10,spec(-12,0,7,12,15)),
 };
-function obj3d(name,t,x=860,y=-6){if(!name||!OBJ[name])return '';const bob=Math.sin(t*2)*6,rot=Math.sin(t*1.3)*10;return `<g transform="translate(${x} ${f(y+bob)}) rotate(${f(rot)}) scale(1.25)"><ellipse cx="6" cy="58" rx="34" ry="8" fill="#000" opacity=".35" filter="url(#fS)"/>${OBJ[name]()}</g>`}
+function obj3d(name,t,x=862,y=-14){if(!name||!OBJ[name])return '';_gid=0;const bob=Math.sin(t*1.8)*5,rot=Math.sin(t*1.1)*4,sc=1.55;
+  return `<g transform="translate(${x} ${f(y+bob)})"><ellipse cx="4" cy="${f(78-bob)}" rx="${f(46-bob)}" ry="9" fill="#000" opacity=".45" style="filter:blur(6px)"/><g transform="rotate(${f(rot)}) scale(${sc})">${OBJ[name]()}</g></g>`}
 const GLOW=['#ff3b4a','#3a6bff','#f5a623','#2fbf71','#38c8ff','#9b7bff','#ff5c9c','#ffc933'];
 function glowFx(c,t,op){let o=`<radialGradient id="gl_${c.slice(1)}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="${c}" stop-opacity=".55"/><stop offset=".6" stop-color="${c}" stop-opacity=".12"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient><g opacity="${f(op)}"><ellipse cx="540" cy="560" rx="560" ry="460" fill="url(#gl_${c.slice(1)})"/>`;
   for(let k=0;k<34;k++){const sp=18+hash(k+3)*30,x=180+hash(k)*720+12*Math.sin(t+k),y=900-((t*sp+hash(k+7)*700)%700),tw=.3+.7*Math.abs(Math.sin(t*2.4+k));o+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(1+hash(k+9)*2.2)}" fill="${c}" opacity="${f(.8*tw)}"/>`}
