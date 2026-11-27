@@ -5,7 +5,7 @@ html,body{margin:0;background:#000;width:1080px;height:1080px;overflow:hidden}
 #stage{position:relative;width:1080px;height:1080px;overflow:hidden;background:#0c0c10}
 svg#main{position:absolute;left:0;top:0;width:1080px;height:1080px}
 svg text{font-family:'Fira Sans','Montserrat','Inter',sans-serif;font-weight:800}
-#cap{position:absolute;left:90px;top:56px;width:900px;display:flex;flex-wrap:wrap;justify-content:center;text-align:center;align-content:flex-start;
+#cap{position:absolute;left:60px;top:50px;width:960px;display:flex;flex-wrap:wrap;justify-content:center;text-align:center;align-content:flex-start;
   font-family:'Fira Sans','Montserrat','Inter',sans-serif;font-weight:700;color:#f4f4f8;line-height:1.25;letter-spacing:0;gap:.1em .26em;text-shadow:none}
 #cap .w{display:inline-block;transform-origin:50% 60%;white-space:nowrap}
 #cap .p{display:inline-block;padding:0 .24em;border-radius:.2em;text-shadow:none;font-weight:900}
@@ -280,10 +280,10 @@ function buildCap(i){capEl.innerHTML='';capWords=[];let k=-1;const L=LINES[i];
     if(tk.mk){w.textContent=tk.txt+tk.tail;w.dataset.acc=tk.txt;}
     else w.textContent=tk.txt+tk.tail;
     w.style.opacity=0;capEl.appendChild(w);capWords.push(w)});
-  let fs=52;capEl.style.fontSize=fs+'px';while(capEl.offsetHeight>140&&fs>34){fs-=2;capEl.style.fontSize=fs+'px'}}
+  let fs=68;capEl.style.fontSize=fs+'px';while(capEl.offsetHeight>180&&fs>44){fs-=2;capEl.style.fontSize=fs+'px'}}
 function lineAt(t){let i=0;for(let j=0;j<LINES.length;j++)if(t>=LINES[j].st)i=j;return i}
 const bgEl=document.getElementById('bgLayer'),pEl=document.getElementById('panelG');
-function accentFx(t,i){const L=LINES[i],lt=t-L.st;let o='',hit=0;const cy=56+capEl.offsetHeight/2;
+function accentFx(t,i){const L=LINES[i],lt=t-L.st;let o='',hit=0;const cy=50+capEl.offsetHeight/2;
   const acc=[];capWords.forEach((w,j)=>{if(w.dataset.acc)acc.push([L.ws?L.ws[j]:W0+WORD*j,w.dataset.acc])});
   acc.forEach((a,k)=>{const st=a[0],en=k<acc.length-1?acc[k+1][0]-.02:L.d-.06,u=lt-st;if(u<0||lt>en)return;
     const txt=a[1].replace(/[«»"]/g,''),size=Math.min(130,1000/(txt.length*.58)),inn=eo(u/.12),out=clamp((lt-(en-.16))/.16);
@@ -305,7 +305,7 @@ function renderAt(t){
   const gc=j=>LINES[j].glow||GLOW[j%GLOW.length];let gl=(i>0&&lt0<FADE)?glowFx(gc(i-1),t,1-ease(lt0/FADE))+glowFx(gc(i),t,ease(lt0/FADE)):glowFx(gc(i),t,1);
   bgEl.innerHTML=`<g transform="translate(540 540) scale(${f(push)}) translate(-540 -540)">`+b+gl+`</g>`;
   const cs=1+.03*H,dr=Math.sin(t*.55)*1.2,fy=Math.sin(t*.8)*6;
-  let p=`<g transform="translate(540 ${f(580+fy)}) rotate(${f(dr)}) scale(${f(cs)}) translate(-540 -580)"><g transform="translate(163 300) scale(.82)">`;
+  let p=`<g transform="translate(540 ${f(580+fy)}) rotate(${f(dr)}) scale(${f(cs)}) translate(-540 -580)"><g transform="translate(186 330) scale(.77)">`;
   LINES.forEach((l,j)=>{const lt=t-l.st;if(lt<-1e-6||lt>l.d+FADE)return;
     const last=j===LINES.length-1,fi=clamp(lt/FADE),fo=last?1:clamp((l.d+FADE-lt)/FADE),op=Math.min(fi,fo);
     const sc=lerp(1.08,1,eo(fi))*lerp(.96,1,fo),bl=(1-fi)*16+(1-fo)*16;
