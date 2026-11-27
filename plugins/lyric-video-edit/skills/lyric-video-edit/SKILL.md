@@ -43,9 +43,7 @@ The user switched back to a DARK theme but wants everything else from the minima
 
 Dark-minimal extras (from the user's latest reference, all in `template-dark-min.html`):
 - Per-scene colored glow behind the card with drifting sparks: set `glow:'#hex'` on a scene (defaults cycle through GLOW).
-- Corner objects like the reference: NO outline/border. Solid extruded 3D (18 offset layers with a darker side gradient), face lit by feDiffuse+feSpecular lighting on its blurred alpha (filter `bev3`, light from top-left), big (~2.1×), hovering over the card's top-right corner with a soft blurred floor shadow, slow Y-spin (scaleX oscillation + slight skew) and bob; pops in at scene start.
-- 3D objects must look truly volumetric (use `ext()`: extruded depth layers + lit gradient face + rim + specular + contact shadow; tiny rotation only) and MUST match the line's meaning literally (bandit → mask, ≠ for 'not like dad', boomerang for 'came back', broken heart for betrayal, coin for money). Never pick a generic icon.
-- Glossy 3D object in the card's top-right corner, chosen by meaning: `obj:'heart'|'star'|'spark'|'pin'|'moon'|'lock'|'check'|'cloud'|'bolt'|'coin'|'crate'|'drop'|'hourglass'|'arrows'` (SVG with gradients + highlight, bobbing). Add new ones to `OBJ` as needed.
+- NO 3D corner objects: the user asked to remove them (obj3d is no longer called; don't add `obj`).
 - Light film grain + vignette on top. Transitions stay blur+scale (no swipe).
 
 ### Light variant details

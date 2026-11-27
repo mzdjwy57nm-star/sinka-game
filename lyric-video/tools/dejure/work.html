@@ -195,7 +195,7 @@ function renderAt(t){
   LINES.forEach((l,j)=>{const lt=t-l.st;if(lt<-1e-6||lt>l.d+FADE)return;
     const last=j===LINES.length-1,fi=clamp(lt/FADE),fo=last?1:clamp((l.d+FADE-lt)/FADE),op=Math.min(fi,fo);
     const sc=lerp(1.08,1,eo(fi))*lerp(.96,1,fo),bl=(1-fi)*16+(1-fo)*16;
-    p+=`<g opacity="${f(op)}" transform="translate(460 320) scale(${f(sc)}) translate(-460 -320)" style="filter:blur(${f(bl)}px)">${(l.frame===false?l.draw(lt):shell(l.theme||'light',l.draw(lt)))+obj3d(l.obj,t,850,-58,lt)}</g>`});
+    p+=`<g opacity="${f(op)}" transform="translate(460 320) scale(${f(sc)}) translate(-460 -320)" style="filter:blur(${f(bl)}px)">${(l.frame===false?l.draw(lt):shell(l.theme||'light',l.draw(lt)))}</g>`});
   pEl.innerHTML=p+`</g></g>`;
   document.getElementById('npG').innerHTML=grainVig(t)+A.svg+nowPlaying(t);
   const lt=lt0;
