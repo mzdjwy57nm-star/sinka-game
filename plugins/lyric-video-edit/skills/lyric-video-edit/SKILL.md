@@ -37,6 +37,16 @@ Build a vertical lyric edit from pasted lyrics: one HTML page where every lyric 
 
 For partial changes (one scene redone), re-render only that scene's frame range into the existing frame folder and re-encode.
 
+## Light minimal style (CURRENT DEFAULT — user's latest reference)
+
+Use `assets/template-light.html` (square 1080×1080, render with `VIEW_H=1080`):
+- Plain light-grey background (#efeff2), no particles, no glow, no hearts, no vignette, no progress bar.
+- Caption: small (~40px) black text, normal sentence case (write `t` in normal case, not caps), top center; each word focuses in from blur; the next word shows faint and blurred just before it is sung.
+- Keep: "now playing" badge top-left (dark text) and the red stretch-from-a-line accent words (`#WORD`).
+- Card: white card with soft shadow by default; set `frame:false` on a scene to float the UI element directly on the background (do this sometimes).
+- Scenes are clean, realistic app widgets with micro-interactions (swipe-to-delete, poll bar filling with motion, search typing with suggestions dropping in, camera shutter, toggles, chips). Draw texts dark (`fill:'#111'`, secondary `#8a8a96`), accents red #ff3b4a, white surfaces, #f0f0f4 fields.
+- Motion: card floats and tilts slightly; scene changes via blur + scale; small zoom punch on accent hits.
+
 ## Square format (default since the user asked for it)
 
 - Use `assets/template-square.html`: 1080×1080 canvas, centered caption at the top, card scaled to 0.82 at y≈262, a progress bar with elapsed/remaining time under it, and a small "now playing" badge top-left (animated equalizer bars + `artist · title`). Set `NP={artist,title}` (escape `&` as `&amp;`). The SC array there ends right before the `/* ---- now playing` block.
