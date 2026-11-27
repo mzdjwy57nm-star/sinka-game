@@ -46,6 +46,7 @@ Use `assets/template-light.html` (square 1080×1080, render with `VIEW_H=1080`):
 - Card: white card with soft shadow by default; set `frame:false` on a scene to float the UI element directly on the background (do this sometimes).
 - Scenes are clean, realistic app widgets with micro-interactions (swipe-to-delete, poll bar filling with motion, search typing with suggestions dropping in, camera shutter, toggles, chips). Draw texts dark (`fill:'#111'`, secondary `#8a8a96`), accents red #ff3b4a, white surfaces, #f0f0f4 fields.
 - Motion: card floats and tilts slightly; scene changes via blur + scale; small zoom punch on accent hits.
+- Pace: change scenes often like the reference — split lyric lines into half-phrases (~1–1.6 s per scene, even 0.5 s for a single punch word), FADE ≈ .22.
 
 ## Square format (default since the user asked for it)
 
