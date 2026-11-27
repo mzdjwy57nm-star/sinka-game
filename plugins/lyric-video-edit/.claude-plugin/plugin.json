@@ -1,0 +1,7 @@
+{
+  "name": "lyric-video-edit",
+  "version": "0.1.1",
+  "description": "Vertical 1080x1920 lyric-video edits: word-by-word CAPS captions on colored plates, a different animated app-screen scene for every line, rendered frame-by-frame to a silent MP4.",
+  "author": { "name": "Lyric edit workflow" },
+  "keywords": ["lyrics", "video", "tiktok", "reels", "edit", "animation"]
+}

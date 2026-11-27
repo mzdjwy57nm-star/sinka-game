@@ -1,0 +1,195 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+html,body{margin:0;background:#000;width:1080px;height:1920px;overflow:hidden}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#05060c}
+svg#main{position:absolute;left:0;top:0;width:1080px;height:1920px}
+svg text{font-family:'Fira Sans','Montserrat','Inter',sans-serif;font-weight:800}
+#cap{position:absolute;left:60px;top:269px;width:960px;display:flex;flex-wrap:wrap;justify-content:flex-start;align-content:flex-start;
+  font-family:'Fira Sans','Montserrat','Inter',sans-serif;font-weight:800;color:#fff;line-height:1.28;letter-spacing:.01em;gap:.1em .22em;text-shadow:0 2px 10px rgba(0,0,0,.45)}
+#cap .w{display:inline-block;transform-origin:50% 60%;white-space:nowrap}
+#cap .p{display:inline-block;padding:0 .24em;border-radius:.2em;text-shadow:none;font-weight:900}
+</style></head>
+<body><div id="stage">
+<svg id="main" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <radialGradient id="gSpark"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".3" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+ <radialGradient id="vig" cx=".5" cy=".5" r=".8"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
+ <linearGradient id="gCy" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#38e0ff"/><stop offset="1" stop-color="#3a6bff"/></linearGradient>
+ <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#e59a12"/></linearGradient>
+ <filter id="fG" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="fS" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="26"/></filter>
+ <clipPath id="clipL"><polygon points="-80,-60 3,-60 -7,-30 7,-8 -5,14 5,40 0,60 -80,60"/></clipPath>
+ <clipPath id="clipR"><polygon points="80,-60 3,-60 -7,-30 7,-8 -5,14 5,40 0,60 80,60"/></clipPath>
+ <clipPath id="clipRes"><rect x="0" y="168" width="920" height="472"/></clipPath>
+ <clipPath id="clipWin"><rect x="200" y="90" width="520" height="430" rx="14"/></clipPath><clipPath id="clipGlass"><path d="M140 140 L400 140 L360 500 Q270 530 180 500 Z"/></clipPath><clipPath id="clipCom"><rect x="0" y="96" width="920" height="400"/></clipPath>
+</defs>
+<g id="bgLayer"></g><g id="panelG"></g>
+</svg>
+<div id="cap"></div>
+</div>
+<script>
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const ease=x=>{x=clamp(x);return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2};
+const eo=x=>1-Math.pow(1-clamp(x),3);
+const backO=x=>{x=clamp(x);const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const lerp=(a,b,t)=>a+(b-a)*t;
+const hash=n=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s)};
+const f=n=>(+n).toFixed(2);
+const fmt=n=>Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+const pct=v=>Math.round(clamp(v)*100)+'%';
+const T=(x,y,s,size,o={})=>`<text x="${x}" y="${y}" font-size="${size}" fill="${o.fill||'#fff'}" opacity="${o.op??1}" text-anchor="${o.a||'start'}" style="font-weight:${o.w||800};letter-spacing:${o.ls||0}px;${o.ff?`font-family:${o.ff};`:''}${o.it?'font-style:italic;':''}">${s}</text>`;
+const COL={pk:'#ff5c9c',gr:'#3ee08f',vi:'#9b7bff',bl:'#3aa8ff',ye:'#ffc933',rd:'#ff4d5e',cy:'#38e0ff',or:'#ff8a3d'};
+
+/* ---- hearts ---- */
+const HP="M0 40 C-60 -5 -35 -45 0 -15 C35 -45 60 -5 0 40 Z";
+const heartIcon=(x,y,s,col,op=1,rot=0)=>`<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)}) scale(${f(s/50)})" opacity="${f(op)}"><path d="${HP}" fill="${col}"/></g>`;
+function brokenIcon(x,y,s,col,op,rot,gap){const h=(sd,cl)=>`<g transform="translate(${f(sd*gap*9)} ${f(gap*3)}) rotate(${f(sd*gap*9)})"><path clip-path="url(#${cl})" d="${HP}" fill="${col}"/></g>`;
+  return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)}) scale(${f(s/50)})" opacity="${f(op)}">${h(-1,'clipL')}${h(1,'clipR')}</g>`}
+const HEARTS=Array.from({length:30},(_,i)=>[0.8+i*1.9,[150,930,880,110,910,180,850,120,930,170][i%10],[40,34,44,32,38,46,34,40,44,34][i%10],i%4===0?0:1]);
+function hearts(t){let o='';HEARTS.forEach((h,i)=>{const age=t-h[0];if(age<0||age>7)return;
+  const y=2020-age/7*2200,x=h[1]+30*Math.sin(age*1.1+i),op=.85*Math.min(1,age/1,(7-age)/1.2),rot=8*Math.sin(age*.9+i);
+  o+=`<g filter="url(#fG)">`+((h[3]&&age>1.6)?brokenIcon(x,y,h[2],'#8a82b8',op*.7,rot,clamp((age-1.6)/1.6)):heartIcon(x,y,h[2],'#8a82b8',op*.7,rot))+`</g>`});
+  return o}
+
+/* ---- backgrounds per scene: [top,bottom,glow] ---- */
+document.getElementById('main').style.filter='saturate(.85)';
+const BGS=[['#04080e','#14243a','#5a8ab0'],['#0c0608','#3a1a1a','#d0805a'],['#04080e','#122038','#4a7ab0'],['#04080c','#10283a','#4a9ab0'],['#08060e','#1e1838','#7a6ab0'],['#04060c','#0e1830','#3a6a9a']];
+document.getElementById('main').querySelector('defs').insertAdjacentHTML('beforeend',BGS.map((b,i)=>`<linearGradient id="bgS${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${b[0]}"/><stop offset=".42" stop-color="${b[0]}"/><stop offset="1" stop-color="${b[1]}"/></linearGradient><radialGradient id="glS${i}"><stop offset="0" stop-color="${b[2]}" stop-opacity=".5"/><stop offset="1" stop-color="${b[2]}" stop-opacity="0"/></radialGradient>`).join(''));
+function bgScene(i,t,op){
+  let o=`<g opacity="${f(op)}"><rect width="1080" height="1920" fill="url(#bgS${i})"/>`;
+  o+=`<circle cx="${f(540+200*Math.sin(t*.22+i))}" cy="${f(1350+110*Math.cos(t*.18+i))}" r="780" fill="url(#glS${i})"/>`;
+  o+=`<circle cx="${f(200+120*Math.cos(t*.15+i*2))}" cy="${f(1000+90*Math.sin(t*.2))}" r="420" fill="url(#glS${i})" opacity=".55"/>`;
+  for(let k=0;k<26;k++){const r=2+hash(k+i*30)*5,x=(hash(k+i*30+9)*1080+16*Math.sin(t*.5+k))%1080,y=1920-((t*(12+hash(k+i*30+3)*24)+hash(k+i*30+5)*1920)%1920);
+    o+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r*2.4)}" fill="url(#gSpark)" opacity="${f((.15+.5*Math.pow(Math.sin(t*1.1+k*2),2))*.8)}"/>`}
+  return o+`</g>`}
+
+/* ---- ui helpers (card-local 920x640) ---- */
+const CW=920,CH=640;
+function shell(theme,inner){
+  const L=theme==='light';
+  return `<rect x="12" y="34" width="${CW-24}" height="${CH}" rx="44" fill="#000" opacity="${L?.28:.4}" filter="url(#fS)"/>
+  <rect width="${CW}" height="${CH}" rx="44" fill="${L?'#f5f7fb':'#10121b'}" fill-opacity="${L?1:.93}"/>
+  ${L?'':`<rect x="1.5" y="1.5" width="${CW-3}" height="${CH-3}" rx="43" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="3"/>`}${inner}`}
+const chip=(cx,cy,txt,col,size=28,tc='#0a0f08')=>{const w=txt.length*size*.66+44;return `<g filter="url(#fG)"><rect x="${f(cx-w/2)}" y="${cy-size*.95}" width="${f(w)}" height="${size*1.9}" rx="${size*.6}" fill="${col}"/></g>`+T(cx,cy+size*.36,txt,size,{a:'middle',w:900,fill:tc})};
+function stamp(txt,x,y,rot,u,col=COL.rd,size=50){if(u<0)return'';const s=lerp(2.4,1,eo(u*4)),op=clamp(u*6),w=txt.length*size*.66+44;
+  return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${f(s)})" opacity="${f(op)}"><rect x="${f(-w/2)}" y="${-size*.95}" width="${f(w)}" height="${size*1.9}" rx="10" fill="#1c0508" fill-opacity=".78" stroke="${col}" stroke-width="5"/>${T(0,size*.36,txt,size,{a:'middle',w:900,fill:col})}</g>`}
+const avatar=(x,y,r,col)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" fill-opacity=".28"/><circle cx="${x}" cy="${f(y-r*.2)}" r="${f(r*.4)}" fill="${col}"/><path d="M${f(x-r*.68)} ${f(y+r*.72)} Q${f(x-r*.68)} ${f(y+r*.2)} ${x} ${f(y+r*.2)} Q${f(x+r*.68)} ${f(y+r*.2)} ${f(x+r*.68)} ${f(y+r*.72)}Z" fill="${col}"/>`;
+const sparkle=(x,y,s,op)=>`<path d="M${x} ${y-s} Q${x+s*.15} ${y-s*.15} ${x+s} ${y} Q${x+s*.15} ${y+s*.15} ${x} ${y+s} Q${x-s*.15} ${y+s*.15} ${x-s} ${y} Q${x-s*.15} ${y-s*.15} ${x} ${y-s}Z" fill="#fff" opacity="${f(op)}"/>`;
+const typed=(s,lt,t0,dur)=>s.slice(0,Math.floor(clamp((lt-t0)/dur)*s.length));
+const caret=lt=>Math.floor(lt*2.5)%2?'|':'';
+const star=(x,y,r,col,op=1)=>`<polygon transform="translate(${x} ${y})" points="0,${-r} ${r*.3},${-r*.3} ${r},${-r*.25} ${r*.5},${r*.15} ${r*.62},${r} 0,${r*.55} ${-r*.62},${r} ${-r*.5},${r*.15} ${-r},${-r*.25} ${-r*.3},${-r*.3}" fill="${col}" opacity="${op}"/>`;
+const tick=(x,y,col)=>`<path d="M${x} ${y} l7 8 l14 -16 M${x+11} ${y} l7 8 l14 -16" fill="none" stroke="${col}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+const searchBar=(txt,lt,light)=>`<rect x="40" y="36" width="840" height="84" rx="42" fill="${light?'#fff':'#fff'}" fill-opacity="${light?1:.1}" stroke="#000" stroke-opacity=".08" stroke-width="2"/><circle cx="94" cy="76" r="16" fill="none" stroke="#6b7280" stroke-width="5"/><path d="M106 88 L120 102" stroke="#6b7280" stroke-width="5" stroke-linecap="round"/>`+T(144,89,txt+caret(lt),38,{fill:'#1b1f2a',w:700})+`<circle cx="836" cy="78" r="26" fill="#3aa8ff" fill-opacity=".15"/><rect x="829" y="62" width="14" height="26" rx="7" fill="#3a7bff"/>`;
+
+/* ---- scenes ---- */
+const snow=(x,y,r,rot,op=1,col='#fff')=>`<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)})" opacity="${op}" stroke="${col}" stroke-width="${f(r*.12)}" stroke-linecap="round" fill="none">`+[0,60,120].map(a=>`<path transform="rotate(${a})" d="M0 ${-r} V${r} M${-r*.28} ${-r*.7} L0 ${-r*.45} L${r*.28} ${-r*.7} M${-r*.28} ${r*.7} L0 ${r*.45} L${r*.28} ${r*.7}"/>`).join('')+`</g>`;
+const FLAME="M0 -62 C22 -30 42 -20 42 10 C42 40 22 62 0 62 C-22 62 -42 40 -42 10 C-42 -10 -26 -20 -16 -42 C-12 -26 -5 -20 0 -62Z";
+const barRow=(x,y,w,label,val,valTxt,col)=>T(x,y,label,18,{ls:2,op:.7})+T(x+w,y,valTxt,22,{a:'end',w:900,fill:col})+`<rect x="${x}" y="${y+12}" width="${w}" height="14" rx="7" fill="#fff" fill-opacity=".12"/><rect x="${x}" y="${y+12}" width="${f(Math.max(0,w*clamp(val)))}" height="14" rx="7" fill="${col}" filter="url(#fG)"/>`;
+const sunI=(x,y,r,rot)=>`<g transform="translate(${x} ${y}) rotate(${f(rot)})"><circle r="${r}" fill="url(#gGold)"/>`+Array.from({length:8},(_,i)=>`<path transform="rotate(${i*45})" d="M0 ${-r-8} V${-r-20}" stroke="#ffd27a" stroke-width="5" stroke-linecap="round"/>`).join('')+`</g>`;
+const GH="M-40 40 V-10 C-40 -50 -20 -70 0 -70 C20 -70 40 -50 40 -10 V40 L25 28 L10 40 L-5 28 L-20 40 L-30 28 Z";
+const FLAME2="M0 -62 C22 -30 42 -20 42 10 C42 40 22 62 0 62 C-22 62 -42 40 -42 10 C-42 -10 -26 -20 -16 -42 C-12 -26 -5 -20 0 -62Z";
+const LORA="'Lora',serif";
+const ringsAt=(x,y,u,col,R=200,n=2)=>{let o='';for(let k=0;k<n;k++){const p=(u-k*.1)/.6;if(p<=0||p>=1)continue;o+=`<circle cx="${x}" cy="${y}" r="${f(lerp(16,R,eo(p)))}" fill="none" stroke="${col}" stroke-width="${f(lerp(9,1,p))}" opacity="${f((1-p)*.9)}"/>`}return o};
+const popIn=(x,y,u,inner)=>u<0?'':`<g transform="translate(${x} ${y}) scale(${f(backO(u/.22))}) translate(${-x} ${-y})">${inner}</g>`;
+const fall=(lt,x0,y0,w,h,n,col='#fff',seed=0)=>{let o='';for(let k=0;k<n;k++){const y=y0+((lt*(40+hash(k+seed)*40)+hash(k+seed+3)*h)%h),x=x0+hash(k+seed+7)*w+Math.sin(lt+k)*10;o+=snow(x,y,5+hash(k+seed)*6,lt*40+k*20,.8,col)}return o};
+const sun=(x,y,r,rot,op=1)=>`<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)})" opacity="${f(op)}"><circle r="${r}" fill="url(#gGold)" filter="url(#fG)"/>`+Array.from({length:10},(_,i)=>`<path transform="rotate(${i*36})" d="M0 ${-r-8} V${-r-24}" stroke="#ffd27a" stroke-width="6" stroke-linecap="round"/>`).join('')+`</g>`;
+const window_=(x,y,w,h,u,lt)=>{let o=`<g opacity="${f(u)}" transform="translate(${x} ${y})"><rect width="${w}" height="${h}" rx="14" fill="#9ad8ff"/><rect y="${h*.62}" width="${w}" height="${h*.38}" fill="#5ac06a"/>`+sun(w*.75,h*.25,h*.1,lt*30);
+  o+=`<path d="M${w*.3} ${h*.62} V${h*.4}" stroke="#6a4a2a" stroke-width="8"/><circle cx="${w*.3}" cy="${h*.34}" r="${h*.14}" fill="#3aa05a"/>`;
+  for(let k=0;k<6;k++)o+=`<circle cx="${f(w*.3+Math.cos(k)*h*.1)}" cy="${f(h*.32+Math.sin(k*2)*h*.08)}" r="5" fill="#ffc2dd"/>`;
+  o+=`<rect width="${w}" height="${h}" rx="14" fill="none" stroke="#e8ebf2" stroke-width="10"/><path d="M${w/2} 0 V${h} M0 ${h/2} H${w}" stroke="#e8ebf2" stroke-width="7"/></g>`;return o};
+const SC=[
+{d:4.10,theme:'dark',t:"НУ И ЧТО, ЧТО ПОД НОГАМИ У МЕНЯ #СНЕГ? #СНЕГ",pc:['cy','bl'],ws:[.25,.68,.92,1.36,1.44,1.60,2.24,2.46,3.00,3.38],
+ draw:lt=>{let o=T(40,66,'ШАГИ',18,{ls:3,op:.7})+T(880,72,'−7°',36,{a:'end',w:900,fill:COL.cy});
+  o+=`<linearGradient id="sw1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2440"/><stop offset="1" stop-color="#e8f0f8"/></linearGradient><rect x="40" y="96" width="840" height="500" rx="24" fill="url(#sw1)"/>`;
+  o+=`<path d="M40 380 Q300 350 460 370 T880 360 V596 H40Z" fill="#f4f8fc"/>`;
+  const n=Math.min(8,Math.floor(lt*2.4));for(let k=0;k<n;k++){const x=120+k*95,y=520-(k%2)*36-k*14;o+=`<g transform="translate(${x} ${y}) rotate(-70)"><ellipse rx="22" ry="11" fill="#b8c8dc"/><ellipse cx="22" ry="8" rx="9" fill="#b8c8dc"/></g>`}
+  o+=fall(lt,40,96,840,500,24,'#fff');
+  o+=`<g transform="translate(${f(Math.min(820,120+n*95+20))} 300)"><circle cy="-40" r="22" fill="#e8ebf2"/><rect x="-20" y="-16" width="40" height="70" rx="16" fill="#3a5a8a"/></g>`;
+  o+=T(40,150,'шагов: '+Math.round(lt*420),24,{w:800,fill:'#fff',op:.8});
+  if(lt>=3.0)o+=ringsAt(460,300,lt-3.0,COL.cy,220)+popIn(460,240,lt-3.0,chip(460,240,'СНЕГ',COL.cy,30,'#04202a'));
+  if(lt>=3.38)o+=popIn(700,180,lt-3.38,T(700,195,'ну и что',40,{a:'middle',w:900,fill:'#fff'}));
+  return o}},
+{d:3.12,theme:'dark',t:"ВСПОМИНАЮ, КАК МНЕ БЫЛО #ТЕПЛО С #НЕЙ",pc:['or','pk'],ws:[.12,.80,.90,1.20,1.54,2.34,2.50],
+ draw:lt=>{let o=T(40,66,'ВОСПОМИНАНИЯ',18,{ls:3,op:.7})+T(880,66,'год назад',20,{a:'end',w:800,op:.55});
+  const PH=[[230,330,-8,.15,'лето'],[460,320,3,.5,'мы'],[690,340,-4,.85,'море']];
+  PH.forEach(([x,y,r,t0,cap],i)=>{const u=clamp((lt-t0)/.5);if(u<=0)return;const b=backO(u);const yy=lerp(y-200,y,b);
+    o+=`<linearGradient id="wm2${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${['#ffb46a','#ff7aa8','#6ac8ff'][i]}"/><stop offset="1" stop-color="${['#ff6a3a','#ff4a7a','#ffc96a'][i]}"/></linearGradient><g transform="translate(${x} ${f(yy)}) rotate(${r})" opacity="${f(Math.min(1,u*3))}"><rect x="-110" y="-140" width="220" height="270" rx="8" fill="#f3f0ea"/><rect x="-96" y="-126" width="192" height="190" fill="url(#wm2${i})"/>`;
+    if(i===1)o+=avatar(-36,10,40,'#5a1a2a')+avatar(36,10,40,'#5a1a2a')+(lt>=2.5?`<g transform="translate(0 -70) scale(${f(backO((lt-2.5)/.25))})"><path d="${HP}" fill="#fff"/></g>`:'');
+    else o+=`<circle cx="40" cy="-70" r="26" fill="#fff6c8" opacity=".85"/>`;
+    o+=T(0,108,cap,32,{a:'middle',ff:LORA,it:1,w:600,fill:'#2b2547'})+`</g>`});
+  const w=ease((lt-1.5)/.6);o+=`<circle cx="460" cy="320" r="${f(150+w*80)}" fill="${COL.or}" opacity="${f(w*.18)}" filter="url(#fS)"/>`;
+  o+=barRow(40,560,840,'ТЕПЛО',lerp(.1,.95,w),Math.round(lerp(-7,24,w))+'°',COL.or);
+  return o}},
+{d:3.48,theme:'dark',t:"НА ДУШЕ #ДЕКАБРЬ, А ЗА ОКНОМ #МАЙ-МАЙ",pc:['bl','gr'],ws:[.12,.36,.90,1.80,2.00,2.24,2.58],
+ draw:lt=>{let o=T(40,66,'НА ДУШЕ',18,{ls:3,op:.7})+T(880,66,'ЗА ОКНОМ',18,{a:'end',ls:3,op:lt>1.8?.7:.2});
+  const cu=eo((lt-.2)/.3);o+=`<g opacity="${f(cu)}"><rect x="40" y="100" width="400" height="490" rx="22" fill="#e8eef6"/><rect x="40" y="100" width="400" height="90" rx="22" fill="#3a6ad0"/><rect x="40" y="160" width="400" height="30" fill="#3a6ad0"/>`+T(240,162,'ДЕКАБРЬ',40,{a:'middle',w:900});
+  for(let d=0;d<31;d++){const c=d%7,r=Math.floor(d/7),hl=d===30;o+=T(84+c*52,240+r*62,String(d+1),24,{a:'middle',w:hl?900:700,fill:hl?'#c8304a':'#2b2547'})}
+  o+=fall(lt,50,200,380,380,10,'#9ab8e0',3)+`</g>`;
+  if(lt>=1.8)o+=window_(480,110,400,470,eo((lt-1.8)/.4),lt);
+  if(lt>=2.58)o+=popIn(680,540,lt-2.58,chip(680,540,'МАЙ',COL.gr,30));
+  return o}},
+{d:3.38,theme:'dark',t:"В ГОЛОВЕ #ЯНВАРЬ, А ЗА ОКНОМ #МАЙ-МАЙ",pc:['cy','ye'],ws:[.12,.22,1.02,1.76,1.94,2.12,2.56],
+ draw:lt=>{let o=T(40,66,'ПОГОДА',18,{ls:3,op:.7});
+  const u1=eo((lt-.1)/.3);o+=`<g opacity="${f(u1)}"><linearGradient id="wc4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a3a6a"/><stop offset="1" stop-color="#5a7ab0"/></linearGradient><rect x="40" y="100" width="410" height="490" rx="26" fill="url(#wc4)"/>`+T(70,150,'В ГОЛОВЕ',20,{ls:3,op:.8});
+  o+=`<path d="M245 230 C175 230 150 290 165 340 C150 380 190 420 230 410 L260 410 C300 420 340 380 325 340 C340 290 315 230 245 230Z" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="6"/>`+fall(lt,165,240,160,160,8,'#fff',5);
+  o+=T(70,520,Math.round(lerp(-2,-23,ease(lt/1.2)))+'°',80,{w:900})+T(70,566,'январь · метель',22,{w:700,op:.75})+`</g>`;
+  if(lt>=1.76){const u=eo((lt-1.76)/.35);o+=`<g opacity="${f(u)}" transform="translate(${f((1-u)*40)} 0)"><linearGradient id="wc4b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a9ae0"/><stop offset="1" stop-color="#ffc96a"/></linearGradient><rect x="470" y="100" width="410" height="490" rx="26" fill="url(#wc4b)"/>`+T(500,150,'ЗА ОКНОМ',20,{ls:3,op:.85})+sun(675,320,62,lt*30)+T(500,520,'+22°',80,{w:900})+T(500,566,'май · ясно',22,{w:700,op:.85})+`</g>`}
+  if(lt>=2.56)o+=ringsAt(675,320,lt-2.56,COL.ye,180);
+  return o}},
+{d:3.42,theme:'dark',t:"В МОИХ ГЛАЗАХ #ФЕВРАЛЬ, А ЗА ОКНОМ #МАЙ-МАЙ",pc:['vi','pk'],ws:[.12,.18,.38,.96,1.80,2.02,2.26,2.64],
+ draw:lt=>{let o=T(40,66,'ВЗГЛЯД',18,{ls:3,op:.7});
+  const may=ease((lt-1.8)/.6),bl=Math.abs(Math.sin(lt*1.4))>.98?.15:1;
+  o+=`<g transform="translate(460 300) scale(1 ${f(bl)})"><path d="M-300 0 Q0 -200 300 0 Q0 200 -300 0Z" fill="#f4f6fa"/><clipPath id="ir5"><circle r="120"/></clipPath><circle r="120" fill="hsl(${f(lerp(210,330,may))},${f(lerp(40,70,may))}%,${f(lerp(55,60,may))}%)"/><g clip-path="url(#ir5)">`;
+  for(let k=0;k<12;k++)o+=`<path transform="rotate(${k*30})" d="M0 0 L0 -120" stroke="#fff" stroke-opacity="${f(.4*(1-may))}" stroke-width="5"/>`;
+  o+=fall(lt,-120,-120,240,240,6,'#fff',8).replace(/opacity="0\.8"/g,`opacity="${f(.8*(1-may))}"`);
+  for(let k=0;k<6;k++)o+=`<circle cx="${f(Math.cos(k+lt)*70)}" cy="${f(Math.sin(k*2+lt)*60)}" r="10" fill="#ffc2dd" opacity="${f(may)}"/>`;
+  o+=`</g><circle r="48" fill="#1a1020"/><circle cx="-30" cy="-34" r="16" fill="#fff" opacity=".85"/></g>`;
+  o+=T(460,560,may>.5?'в отражении: май':'в глазах: февраль',30,{a:'middle',w:900,fill:may>.5?COL.pk:COL.vi});
+  if(lt>=1.8)for(let k=0;k<3;k++){const p=((lt-1.8)*.5+k/3)%1,x=lerp(100,820,p),y=180+k*60+Math.sin(p*12)*20,wg=Math.abs(Math.sin(lt*14+k))*16;o+=`<g transform="translate(${f(x)} ${f(y)})" opacity="${f(may)}"><ellipse cx="-8" rx="${f(4+wg*.5)}" ry="12" fill="${COL.pk}"/><ellipse cx="8" rx="${f(4+wg*.5)}" ry="12" fill="${COL.ye}"/></g>`}
+  if(lt>=2.64)o+=ringsAt(460,300,lt-2.64,COL.pk,240);
+  return o}},
+{d:4.90,theme:'dark',t:"ВНУТРИ МЕНЯ #ЗИМА, I FEEL LIKE #DYING-DYING-DYING",pc:['cy','vi'],ws:[.12,.40,.88,2.00,2.06,2.16,2.44],
+ draw:lt=>{const fr=ease((lt-.6)/1.4),en=lerp(.62,.04,ease((lt-1.8)/1.4));
+  let o=T(40,66,'ВНУТРИ',18,{ls:3,op:.7})+T(880,72,Math.round(lerp(8,-30,fr))+'°',36,{a:'end',w:900,fill:COL.cy});
+  o+=`<rect x="40" y="100" width="400" height="490" rx="26" fill="#fff" fill-opacity=".06"/>`+T(70,150,'ТЕМПЕРАТУРА',18,{ls:3,op:.6});
+  o+=`<rect x="215" y="180" width="50" height="300" rx="25" fill="#fff" fill-opacity=".12"/><circle cx="240" cy="510" r="48" fill="${COL.cy}"/><rect x="225" y="${f(480-280*(1-fr))}" width="30" height="${f(280*(1-fr)+20)}" rx="15" fill="${COL.cy}"/>`;
+  for(let k=0;k<6;k++)o+=snow(90+(k%2)*300,200+k*60,14*fr,lt*30+k*20,fr*.8,'#dff6ff');
+  o+=`<rect x="470" y="100" width="410" height="490" rx="26" fill="#fff" fill-opacity=".06"/>`+T(500,150,'ЭНЕРГИЯ',18,{ls:3,op:.6});
+  const col=en>.3?COL.gr:en>.12?COL.ye:COL.rd,blink=en<.12&&Math.floor(lt*3)%2?.4:1;
+  o+=`<rect x="540" y="220" width="270" height="130" rx="24" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="7"/><rect x="814" y="260" width="16" height="50" rx="6" fill="#fff" opacity=".8"/><rect x="554" y="234" width="${f(Math.max(16,242*en))}" height="102" rx="14" fill="${col}" opacity="${f(blink)}"/>`;
+  o+=T(675,440,pct(en),72,{a:'middle',w:900,fill:col,op:blink});
+  if(en<.15){const u=eo((lt-3.2)/.3);o+=`<g opacity="${f(u)}"><rect x="500" y="480" width="350" height="70" rx="35" fill="${COL.vi}" fill-opacity=".25" stroke="${COL.vi}" stroke-width="3"/>`+T(675,524,'нужно тепло',26,{a:'middle',w:900,fill:'#fff'})+`</g>`}
+  return o}},
+];
+const LINES=SC;let acc=0;LINES.forEach(l=>{l.st=acc;acc+=l.d});
+const TOTAL=acc,FADE=.35,WORD=.11,W0=.2;
+const PL={pk:[COL.pk,'#fff'],gr:[COL.gr,'#06210f'],vi:[COL.vi,'#fff'],bl:[COL.bl,'#04182b'],ye:[COL.ye,'#1c1500'],rd:[COL.rd,'#fff'],or:[COL.or,'#2a0f00'],cy:[COL.cy,'#04202a']};
+const capEl=document.getElementById('cap');let capIdx=-1,capWords=[];
+function parse(text){const toks=[];text.split(' ').forEach(w=>{const m=/^([#+]?)(.*?)([,.?!:;…]*)$/.exec(w);toks.push({mk:m[1],txt:m[2],tail:m[3]})});return toks}
+function buildCap(i){capEl.innerHTML='';capWords=[];let k=-1;const L=LINES[i];
+  parse(L.t).forEach(tk=>{const w=document.createElement('span');w.className='w';
+    if(tk.mk){if(tk.mk==='#')k++;const c=PL[L.pc[Math.min(k,L.pc.length-1)]];const p=document.createElement('span');p.className='p';p.textContent=tk.txt;p.style.background=c[0];p.style.color=c[1];p.style.boxShadow=`0 0 28px ${c[0]}99`;w.appendChild(p);if(tk.tail)w.appendChild(document.createTextNode(tk.tail));}
+    else w.textContent=tk.txt+tk.tail;
+    w.style.opacity=0;capEl.appendChild(w);capWords.push(w)});
+  let fs=62;capEl.style.fontSize=fs+'px';while(capEl.offsetHeight>380&&fs>40){fs-=2;capEl.style.fontSize=fs+'px'}}
+function lineAt(t){let i=0;for(let j=0;j<LINES.length;j++)if(t>=LINES[j].st)i=j;return i}
+const bgEl=document.getElementById('bgLayer'),pEl=document.getElementById('panelG');
+function renderAt(t){
+  const i=lineAt(t),lt0=t-LINES[i].st;
+  let b='';if(i>0&&lt0<FADE){b=bgScene(i-1,t,1)+bgScene(i,t,ease(lt0/FADE))}else b=bgScene(i,t,1);
+  bgEl.innerHTML=b+hearts(t)+`<rect width="1080" height="1920" fill="url(#vig)"/>`;
+  let p=`<g transform="translate(80 730)">`;
+  LINES.forEach((l,j)=>{const lt=t-l.st;if(lt<-1e-6||lt>l.d+FADE)return;
+    const last=j===LINES.length-1,fi=clamp(lt/FADE),fo=last?1:clamp((l.d+FADE-lt)/FADE),op=Math.min(fi,fo);
+    const dy=(1-eo(fi))*30-(1-fo)*20,bl=(1-fi)*14+(1-fo)*14;
+    p+=`<g opacity="${f(op)}" transform="translate(0 ${f(dy)})" style="filter:blur(${f(bl)}px)">${shell(l.theme,l.draw(lt))}</g>`});
+  pEl.innerHTML=p+`</g>`;
+  if(i!==capIdx){buildCap(i);capIdx=i}
+  const lt=lt0;
+  capWords.forEach((w,j)=>{const ws=LINES[i].ws?LINES[i].ws[j]:W0+WORD*j,u=(lt-ws)/.16;if(u<0){w.style.opacity=0;return}
+    const bb=backO(u);w.style.opacity=Math.min(1,u*4);w.style.transform=`translateY(${(1-bb)*12}px) scale(${.82+.18*bb})`;w.style.filter=u<1?`blur(${f((1-clamp(u))*6)}px)`:'none'});
+}
+window.TOTAL=TOTAL;window.renderAt=renderAt;window.LINES=LINES;
+document.fonts.ready.then(()=>{renderAt(0);window.READY=true});
+</script></body></html>
