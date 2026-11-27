@@ -41,6 +41,11 @@ For partial changes (one scene redone), re-render only that scene's frame range 
 
 The user switched back to a DARK theme but wants everything else from the minimal reference (small sentence-case caption with focus-in, high scene frequency, now-playing badge, sparing red accents, card or frameless widgets). Use `assets/template-dark-min.html` (scenes: theme:'dark', text #f4f4f8, sub #8a8a96, fields #1e1e28, cards #16161e). `assets/template-light.html` is the same thing on light grey.
 
+Dark-minimal extras (from the user's latest reference, all in `template-dark-min.html`):
+- Per-scene colored glow behind the card with drifting sparks: set `glow:'#hex'` on a scene (defaults cycle through GLOW).
+- Glossy 3D object in the card's top-right corner, chosen by meaning: `obj:'heart'|'star'|'spark'|'pin'|'moon'|'lock'|'check'|'cloud'|'bolt'|'coin'|'crate'|'drop'|'hourglass'|'arrows'` (SVG with gradients + highlight, bobbing). Add new ones to `OBJ` as needed.
+- Light film grain + vignette on top. Transitions stay blur+scale (no swipe).
+
 ### Light variant details
 
 Use `assets/template-light.html` (square 1080×1080, render with `VIEW_H=1080`):
