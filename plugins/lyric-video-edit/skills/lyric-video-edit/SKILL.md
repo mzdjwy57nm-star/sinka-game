@@ -37,7 +37,11 @@ Build a vertical lyric edit from pasted lyrics: one HTML page where every lyric 
 
 For partial changes (one scene redone), re-render only that scene's frame range into the existing frame folder and re-encode.
 
-## Minimal style (CURRENT DEFAULT) — dark variant preferred now
+## FORMAT: vertical 9:16 again (user's latest choice)
+
+Use `assets/template-dark-vert.html` (1080×1920, render with VIEW_H=1920): caption at ~240px, card 920×640 at translate(80 730), player at the bottom (y≈1760), glow centered on the card. NO tilts anywhere: no card rotation, no rotated floatCards — everything straight.
+
+## Minimal style — dark variant preferred
 
 The user switched back to a DARK theme but wants everything else from the minimal reference (small sentence-case caption with focus-in, high scene frequency, now-playing badge, sparing red accents, card or frameless widgets). Use `assets/template-dark-min.html` (scenes: theme:'dark', text #f4f4f8, sub #8a8a96, fields #1e1e28, cards #16161e). `assets/template-light.html` is the same thing on light grey.
 
