@@ -1,0 +1,70 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+html,body{margin:0;background:#000;width:1080px;height:1920px;overflow:hidden}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#0d0710}
+svg#main{position:absolute;left:0;top:0;width:1080px;height:1920px}
+svg text{font-family:'Fira Sans','Inter',sans-serif}
+#cap{position:absolute;left:60px;top:1110px;width:960px;display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;
+  font-family:'Fira Sans','Inter',sans-serif;font-weight:900;color:#fff;text-transform:uppercase;line-height:1.08;gap:.06em .22em;letter-spacing:.01em}
+#cap .w{display:inline-block;transform-origin:50% 60%;white-space:nowrap}
+#cap .p{display:inline-block;padding:0 .14em;border-radius:.08em}
+</style></head>
+<body><div id="stage">
+<svg id="main" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>
+ <filter id="glw" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g id="bg"></g><g id="obj"></g><g id="ui"></g>
+</svg>
+<div id="cap"></div>
+</div>
+<script>
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const ease=x=>{x=clamp(x);return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2};
+const eo=x=>1-Math.pow(1-clamp(x),3);
+const backO=x=>{x=clamp(x);const c1=1.9,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const lerp=(a,b,t)=>a+(b-a)*t;
+const hash=n=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s)};
+const f=n=>(+n).toFixed(2);
+const T=(x,y,s,size,o={})=>`<text x="${x}" y="${y}" font-size="${size}" fill="${o.fill||'#fff'}" opacity="${o.op??1}" text-anchor="${o.a||'middle'}" style="font-weight:${o.w||900};letter-spacing:${o.ls||0}px">${s}</text>`;
+const PLATE={pk:['#ff2d6f','#fff'],ye:['#ffc62e','#1a1200'],vi:['#8a5cff','#fff'],cy:['#2ed0ff','#04202a'],rd:['#ff3048','#fff'],gr:['#2fd47a','#04210f']};
+const shadow=(x,y,rx,op=.45)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${f(rx*.16)}" fill="#000" opacity="${op}" filter="url(#soft)"/>`;
+/* ===== SCENES (replace) ===== */
+const SC=[];
+/* ===== end scenes ===== */
+const NP={artist:'',title:''};
+const LINES=SC;let acc=0;LINES.forEach(l=>{l.st=acc;acc+=l.d});const TOTAL=acc,FADE=.18;
+function bg(t,i,lt){const L=LINES[i],c=L.glow||'#ff2d6f',P=LINES[i-1];let o=`<rect width="1080" height="1920" fill="${L.light?'#f6eedc':'#0d0710'}"/>`;
+  const g=(col,op)=>`<radialGradient id="g${col.slice(1)}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="${col}" stop-opacity="${L.light?.0:.55}"/><stop offset=".55" stop-color="${col}" stop-opacity="${L.light?0:.16}"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></radialGradient><ellipse cx="540" cy="820" rx="760" ry="900" fill="url(#g${col.slice(1)})" opacity="${f(op)}"/>`;
+  if(P&&lt<FADE*2)o+=g(P.glow||'#ff2d6f',1-lt/(FADE*2));o+=g(c,clamp(lt/(FADE*2)));
+  if(!L.light)for(let k=0;k<40;k++){const x=hash(k)*1080,y=(hash(k+40)*1920+t*(6+hash(k+80)*10))%1920;o+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(1+hash(k+9)*1.6)}" fill="#fff" opacity="${f(.12+.25*Math.abs(Math.sin(t+k)))}"/>`}
+  return o}
+function ui(t,i){const L=LINES[i],dark=!L.light,fg=dark?'#fff':'#111',p=clamp(t/TOTAL);let o='';
+  if(NP.artist)o+=T(540,96,`♪ ${NP.artist} · ${NP.title}`,22,{w:700,fill:fg,op:.7});
+  o+=`<rect x="140" y="1590" width="800" height="5" rx="2.5" fill="${fg}" opacity=".2"/><rect x="140" y="1590" width="${f(800*p)}" height="5" rx="2.5" fill="${fg}" opacity=".85"/><circle cx="${f(140+800*p)}" cy="1592.5" r="9" fill="${fg}"/>`;
+  return o}
+const capEl=document.getElementById('cap');let capIdx=-1,capWords=[];
+function buildCap(i){capEl.innerHTML='';capWords=[];let k=-1;const L=LINES[i];
+  L.t.split(' ').forEach(w=>{const m=/^([#+]?)(.*)$/.exec(w);const el=document.createElement('span');el.className='w';
+    if(m[1]){if(m[1]==='#')k++;const c=PLATE[L.pc[Math.min(k,L.pc.length-1)]];const p=document.createElement('span');p.className='p';p.textContent=m[2];p.style.background=c[0];p.style.color=c[1];el.appendChild(p);el.dataset.plate=1}else el.textContent=m[2];
+    el.style.opacity=0;capEl.appendChild(el);capWords.push(el)});
+  let fs=92;capEl.style.fontSize=fs+'px';while(capEl.offsetHeight>320&&fs>56){fs-=4;capEl.style.fontSize=fs+'px'}}
+function lineAt(t){let i=0;for(let j=0;j<LINES.length;j++)if(t>=LINES[j].st)i=j;return i}
+function renderAt(t){const i=lineAt(t),L=LINES[i],lt=t-L.st;
+  if(i!==capIdx){buildCap(i);capIdx=i}
+  document.getElementById('bg').innerHTML=bg(t,i,lt);
+  // object: pop in, slide/blur out at the end
+  const pin=backO(lt/.32),out=clamp((lt-(L.d-.16))/.16),ox=out*-620,bl=out*18+(1-clamp(lt/.15))*10;
+  document.getElementById('obj').innerHTML=`<g transform="translate(${f(540+ox)} 700) scale(${f(pin*(1-out*.2))})" style="filter:blur(${f(bl)}px)" opacity="${f(clamp(lt/.1)*(1-out*.6))}">${L.draw(lt)}</g>`;
+  document.getElementById('ui').innerHTML=ui(t,i);
+  capEl.style.color=L.light?'#111':'#fff';
+  capEl.style.transform=`translateX(${f(out*-500)}px)`;capEl.style.filter=out>0?`blur(${f(out*14)}px)`:'none';
+  capWords.forEach((w,j)=>{const ws=L.ws?L.ws[j]:.12+.11*j,u=(lt-ws)/.16;if(u<0){w.style.opacity=0;return}
+    const b=backO(u);w.style.opacity=Math.min(1,u*3);w.style.transform=`scale(${f(.6+.4*b)})`;w.style.filter=u<1?`blur(${f((1-clamp(u))*8)}px)`:'none';
+    if(w.dataset.plate){const p=w.firstChild;p.style.clipPath=`inset(0 ${f((1-eo(u))*100)}% 0 0)`}});
+}
+window.TOTAL=TOTAL;window.renderAt=renderAt;window.LINES=LINES;
+document.fonts.ready.then(()=>{renderAt(0);window.READY=true});
+</script></body></html>

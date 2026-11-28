@@ -37,6 +37,10 @@ Build a vertical lyric edit from pasted lyrics: one HTML page where every lyric 
 
 For partial changes (one scene redone), re-render only that scene's frame range into the existing frame folder and re-encode.
 
+## POP style (CURRENT DEFAULT — user's newest reference)
+
+Use `assets/template-pop.html` (1080×1920, VIEW_H=1920). No card: one big flat cartoon object per scene in the upper-middle (drawn around (0,0), placed at (540,700)), solid fills + white highlights + soft floor shadow, it pops in with overshoot and slides out left with blur. Caption under it (top≈1110): heavy CAPS, ~92px, centered, words pop with scale+blur, key words on colored plates (`#WORD`, plate colors pk/ye/vi/cy/rd/gr) that wipe in. Background: dark plum (#0d0710) with a big radial glow in the scene color (`glow`), faint dust; a scene may set `light:true` for a cream background. Bottom: thin progress line with knob. Optional tiny "♪ artist · title" at the top. Objects animate by meaning (lock opens, toggle flips, drop grows, tape crosses lips, megaphone waves). Scenes change often.
+
 ## FORMAT: vertical 9:16 again (user's latest choice)
 
 Use `assets/template-dark-vert.html` (1080×1920, render with VIEW_H=1920): caption at ~240px, card 920×640 at translate(80 730), player at the bottom (y≈1760), glow centered on the card. NO tilts anywhere: no card rotation, no rotated floatCards — everything straight.
